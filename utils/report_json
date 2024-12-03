@@ -67,11 +67,11 @@ def detect_type(value):
                         return "bool"
                     return "str"
 
-def analyze_csv(csv_file):
+def analyze_delimited_file(file_path, delimiter=','):
     try:
-        file_size = os.path.getsize(csv_file)
-        with open(csv_file, 'r') as f:
-            reader = csv.reader(f)
+        file_size = os.path.getsize(file_path)
+        with open(file_path, 'r') as f:
+            reader = csv.reader(f, delimiter=delimiter)
             headers = next(reader, None)
             row_count = 0
             sample_rows = []
@@ -85,13 +85,14 @@ def analyze_csv(csv_file):
                     detected_type = detect_type(value)
                     column_types[i].add(detected_type)
     except FileNotFoundError:
-        print(f"Error: File '{csv_file}' not found")
+        print(f"Error: File '{file_path}' not found")
         sys.exit(1)
     except csv.Error as e:
-        print(f"Error: '{csv_file}' contains invalid CSV data: {e}")
+        print(f"Error: '{file_path}' contains invalid data: {e}")
         sys.exit(1)
 
-    print(f"\nCSV File Analysis: {os.path.basename(csv_file)}")
+    file_type = "TSV" if delimiter == '\t' else "CSV"
+    print(f"\n{file_type} File Analysis: {os.path.basename(file_path)}")
     print(f"{'=' * 50}")
     print(f"File Size: {file_size:,} bytes")
     print(f"Number of Rows (excluding headers): {row_count:,}")
@@ -113,7 +114,7 @@ def analyze_csv(csv_file):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: ./report_file <json_file_or_csv_file>")
+        print("Usage: ./report_file <json_file_or_csv_file_or_tsv_file>")
         sys.exit(1)
 
     input_file = sys.argv[1]
@@ -147,8 +148,9 @@ if __name__ == "__main__":
         print("-" * 50)
         structure = extract_structure(json_data)
         print(structure)
-    elif file_extension == ".csv":
-        analyze_csv(input_file)
+    elif file_extension in [".csv", ".tsv"]:
+        delimiter = '\t' if file_extension == ".tsv" else ','
+        analyze_delimited_file(input_file, delimiter)
     else:
-        print(f"Error: Unsupported file format '{file_extension}'. Only .json and .csv are supported.")
+        print(f"Error: Unsupported file format '{file_extension}'. Only .json, .csv, and .tsv are supported.")
         sys.exit(1)
