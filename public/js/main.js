@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { createVolcanoMap, metadata as volcanoMetadata } from '../../visualizations/contour/volcano_contours_2.js';
+import { createVolcanoMap, metadata as volcanoMetadata } from '../../visualizations/map/contour/volcano_contours_2/volcano_contours_2.js';
 
 // Available visualizations with their metadata
 const visualizations = {
