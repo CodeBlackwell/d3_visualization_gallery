@@ -1,0 +1,154 @@
+#!/usr/bin/env python3
+
+import json
+import sys
+import os
+import csv
+from collections.abc import Mapping, Sequence
+import datetime
+
+def get_type_sample(value):
+    if isinstance(value, (str, int, float, bool)):
+        return f"(example: {repr(value)})"
+    return ""
+
+def count_elements(data):
+    count = 1
+    if isinstance(data, dict):
+        for value in data.values():
+            count += count_elements(value)
+    elif isinstance(data, list):
+        for item in data:
+            count += count_elements(item)
+    return count
+
+def extract_structure(data, indent=0, max_array_items=3):
+    prefix = ' ' * indent
+    structure = ""
+
+    if isinstance(data, dict):
+        structure += f"{prefix}Object ({len(data)} keys)\n"
+        for key, value in data.items():
+            structure += f"{prefix}  {key}:\n"
+            structure += extract_structure(value, indent + 4)
+    elif isinstance(data, list):
+        structure += f"{prefix}Array (length: {len(data)})\n"
+        if len(data) > 0:
+            sample_size = min(max_array_items, len(data))
+            for i in range(sample_size):
+                structure += f"{prefix}  Item {i}:\n"
+                structure += extract_structure(data[i], indent + 4)
+            if len(data) > max_array_items:
+                structure += f"{prefix}  ... ({len(data) - max_array_items} more items)\n"
+    else:
+        sample = get_type_sample(data)
+        structure += f"{prefix}{type(data).__name__} {sample}\n"
+
+    return structure
+
+def detect_type(value):
+    try:
+        int(value)
+        return "int"
+    except ValueError:
+        try:
+            float(value)
+            return "float"
+        except ValueError:
+            try:
+                datetime.datetime.strptime(value, "%Y-%m-%d")
+                return "date"
+            except ValueError:
+                try:
+                    datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+                    return "datetime"
+                except ValueError:
+                    if value.lower() in ["true", "false"]:
+                        return "bool"
+                    return "str"
+
+def analyze_csv(csv_file):
+    try:
+        file_size = os.path.getsize(csv_file)
+        with open(csv_file, 'r') as f:
+            reader = csv.reader(f)
+            headers = next(reader, None)
+            row_count = 0
+            sample_rows = []
+            column_types = [set() for _ in range(len(headers))] if headers else []
+
+            for row in reader:
+                row_count += 1
+                if len(sample_rows) < 3:
+                    sample_rows.append(row)
+                for i, value in enumerate(row):
+                    detected_type = detect_type(value)
+                    column_types[i].add(detected_type)
+    except FileNotFoundError:
+        print(f"Error: File '{csv_file}' not found")
+        sys.exit(1)
+    except csv.Error as e:
+        print(f"Error: '{csv_file}' contains invalid CSV data: {e}")
+        sys.exit(1)
+
+    print(f"\nCSV File Analysis: {os.path.basename(csv_file)}")
+    print(f"{'=' * 50}")
+    print(f"File Size: {file_size:,} bytes")
+    print(f"Number of Rows (excluding headers): {row_count:,}")
+    print(f"Number of Columns: {len(headers) if headers else 0}")
+    if headers:
+        print(f"Column Names: {', '.join(headers)}")
+        column_types_str = []
+        for types in column_types:
+            if len(types) > 1:
+                column_types_str.append(f"mixed ({', '.join(types)})")
+            else:
+                column_types_str.append(next(iter(types)))
+        print(f"Column Types: {', '.join(column_types_str)}")
+
+    print("\nSample Rows:")
+    print("-" * 50)
+    for i, row in enumerate(sample_rows):
+        print(f"Row {i}: {row}")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: ./report_file <json_file_or_csv_file>")
+        sys.exit(1)
+
+    input_file = sys.argv[1]
+    if not os.path.isfile(input_file):
+        print(f"Error: File '{input_file}' not found")
+        sys.exit(1)
+
+    file_extension = os.path.splitext(input_file)[1].lower()
+    if file_extension == ".json":
+        try:
+            file_size = os.path.getsize(input_file)
+            with open(input_file, 'r') as f:
+                json_data = json.load(f)
+        except FileNotFoundError:
+            print(f"Error: File '{input_file}' not found")
+            sys.exit(1)
+        except json.JSONDecodeError:
+            print(f"Error: '{input_file}' contains invalid JSON")
+            sys.exit(1)
+
+        print(f"\nJSON File Analysis: {os.path.basename(input_file)}")
+        print(f"{'='* 50}")
+        print(f"File Size: {file_size:,} bytes")
+        print(f"Total Elements: {count_elements(json_data):,}")
+        if isinstance(json_data, dict):
+            print(f"Root Keys: {', '.join(json_data.keys())}")
+        elif isinstance(json_data, list):
+            print(f"Root Array Length: {len(json_data)}")
+
+        print("\nDetailed Structure:")
+        print("-" * 50)
+        structure = extract_structure(json_data)
+        print(structure)
+    elif file_extension == ".csv":
+        analyze_csv(input_file)
+    else:
+        print(f"Error: Unsupported file format '{file_extension}'. Only .json and .csv are supported.")
+        sys.exit(1)
