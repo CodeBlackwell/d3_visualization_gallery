@@ -1,12 +1,23 @@
 import * as d3 from 'd3';
 import { createVolcanoMap, metadata as volcanoMetadata } from '../../visualizations/map/contour/volcano_contours_2/volcano_contours_2.js';
+import { createLetterFrequencyChart, metadata as letterFrequencyMetadata } from '../../visualizations/bar/bar-chart/letter_frequency.js';
+import { createNetworkVisualization, metadata as networkMetadata } from '../../visualizations/diagram/arc-diagram/arc-diagram.js';
 
 // Available visualizations with their metadata
 const visualizations = {
+    'network-diagram': {
+        create: createNetworkVisualization,
+        metadata: networkMetadata
+    },
     'volcano-contours': {
         create: createVolcanoMap,
         metadata: volcanoMetadata
-    }
+    },
+    'letter-frequency': {
+        create: createLetterFrequencyChart,
+        metadata: letterFrequencyMetadata
+    },
+    
     // Add more visualizations here as we create them
 };
 
@@ -71,7 +82,9 @@ function createVisSelector() {
         menuContainer
             .append('select')
             .on('change', function() {
-                showVisualization(this.value);
+                showVisualization(this.value).catch(error => {
+                    console.error('Error showing visualization:', error);
+                });
             })
             .selectAll('option')
             .data(Object.entries(visualizations))
@@ -87,7 +100,7 @@ function createVisSelector() {
 }
 
 // Function to show a specific visualization
-function showVisualization(visId) {
+async function showVisualization(visId) {
     const vis = visualizations[visId];
     if (!vis) return;
 
@@ -112,14 +125,16 @@ function showVisualization(visId) {
     document.head.appendChild(style);
 
     // Create the visualization
-    vis.create(container);
+    await vis.create(container);
 }
 
 // Initialize the visualization selector and show the first visualization
 createVisSelector();
 const firstVisId = Object.keys(visualizations)[0];
 if (firstVisId) {
-    showVisualization(firstVisId);
+    showVisualization(firstVisId).catch(error => {
+        console.error('Error showing visualization:', error);
+    });
 }
 
 // Hot Module Replacement

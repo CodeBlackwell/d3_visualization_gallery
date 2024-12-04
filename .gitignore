@@ -43,3 +43,5 @@ notebooks
 notebooks/
 notebooks/*
 public/data/
+root_resources/**
+
