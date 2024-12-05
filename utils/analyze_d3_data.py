@@ -68,13 +68,13 @@ def process_visualization(viz_dir):
     """Process a single visualization directory."""
     js_files = list(Path(viz_dir).glob('*.js'))
     if not js_files:
-        return
+        return None
     
     js_file = js_files[0]  # Take the first JS file
     data_sources = extract_data(js_file)
     
     if not data_sources:
-        return
+        return js_file  # Return the file path if no data sources found
     
     print(f"\nProcessing {js_file.parent.name}...")
     
@@ -123,15 +123,29 @@ def process_visualization(viz_dir):
         f.write('\n'.join(report_content))
     
     print(f"Report written to: {report_path}")
+    return None  # Return None to indicate successful processing
 
 def main():
     """Main function to process all visualizations."""
     gallery_path = Path(D3_GALLERY_PATH)
     
-    # Process each visualization directory
+    # Process each visualization directory and collect files without reports
+    files_without_reports = []
     for viz_dir in gallery_path.iterdir():
         if viz_dir.is_dir():
-            process_visualization(viz_dir)
+            result = process_visualization(viz_dir)
+            if result:
+                files_without_reports.append(result)
+    
+    # Print summary of files without reports
+    if files_without_reports:
+        print("\n\nFiles without data reports:")
+        print("=" * 50)
+        for file in files_without_reports:
+            print(f"- {file.relative_to(gallery_path)}")
+        print(f"\nTotal: {len(files_without_reports)} files")
+    else:
+        print("\nAll files were processed successfully!")
 
 if __name__ == "__main__":
     main()
