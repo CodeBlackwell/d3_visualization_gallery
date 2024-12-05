@@ -46,3 +46,5 @@ public/data/
 root_resources
 root_resources/**
 root_resources/
+
+**/__pycache__
