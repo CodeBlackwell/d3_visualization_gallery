@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import VisualizationContainer from '../shared/VisualizationContainer/VisualizationContainer';
 import './DatasetExploration.css';
@@ -40,6 +40,7 @@ const DATASET_CONFIGS: Record<string, DatasetConfig> = {
 const DatasetExploration: React.FC = () => {
   const { datasetId } = useParams<{ datasetId: string }>();
   const dataset = datasetId ? DATASET_CONFIGS[datasetId] : null;
+  const [selectedViz, setSelectedViz] = useState<number>(0);
 
   if (!dataset) {
     return (
@@ -57,18 +58,33 @@ const DatasetExploration: React.FC = () => {
         <p className="dataset-description">{dataset.description}</p>
       </div>
       
-      <div className="visualizations-grid">
-        {dataset.visualizations.map((viz, index) => (
+      <div className="dataset-content">
+        <div className="visualization-sidebar">
+          <h2>Visualizations</h2>
+          <ul className="visualization-list">
+            {dataset.visualizations.map((viz, index) => (
+              <li 
+                key={index}
+                className={`visualization-item ${selectedViz === index ? 'active' : ''}`}
+                onClick={() => setSelectedViz(index)}
+              >
+                <h3>{viz.title}</h3>
+                <p>{viz.description}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="visualization-main">
           <VisualizationContainer
-            key={index}
-            title={viz.title}
-            description={viz.description}
+            title={dataset.visualizations[selectedViz].title}
+            description={dataset.visualizations[selectedViz].description}
           >
             <div className="visualization-placeholder">
               <p>Visualization coming soon!</p>
             </div>
           </VisualizationContainer>
-        ))}
+        </div>
       </div>
     </div>
   );

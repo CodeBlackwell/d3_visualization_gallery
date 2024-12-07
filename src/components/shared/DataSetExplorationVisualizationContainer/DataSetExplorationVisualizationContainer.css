@@ -1,0 +1,62 @@
+.dataset-visualization-container {
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  height: calc(100vh - 320px);
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.dataset-visualization-header {
+  padding: 2rem;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.dataset-visualization-header h2 {
+  color: var(--color-text-primary);
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-family: var(--font-heading);
+}
+
+.dataset-visualization-header p {
+  color: var(--color-text-secondary);
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  max-width: 800px;
+}
+
+.dataset-visualization-content {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-background);
+  overflow: auto;
+}
+
+.visualization-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  color: var(--color-text-secondary);
+  text-align: center;
+  padding: 2rem;
+}
+
+.visualization-placeholder p {
+  font-size: 1.2rem;
+  margin: 0;
+  opacity: 0.7;
+}

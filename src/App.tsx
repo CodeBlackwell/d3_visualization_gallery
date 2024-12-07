@@ -4,7 +4,7 @@ import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import VisualizationGallery from './components/VisualizationGallery/VisualizationGallery';
 import About from './components/About/About';
-import DatasetExploration from './components/DatasetExploration/DatasetExploration';
+import GlobalHealthExploration from './components/Datasets/GlobalHealth/GlobalHealthExploration';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 const App: React.FC = () => {
@@ -16,7 +16,7 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<VisualizationGallery />} />
             <Route path="/visualization/:id" element={<VisualizationGallery />} />
-            <Route path="/datasetexploration/:datasetId" element={<DatasetExploration />} />
+            <Route path="/datasetexploration/globalhealth" element={<GlobalHealthExploration />} />
             <Route path="/about" element={<About />} />
           </Routes>
         </main>
