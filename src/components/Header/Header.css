@@ -43,15 +43,26 @@
   color: #C1A15A;
 }
 
+.dropdown-container {
+  position: relative;
+  padding-bottom: 1rem;
+  margin-bottom: -1rem;
+}
+
 .datasets-button {
   background: none;
   border: none;
-  padding: 0;
+  padding: 0.5rem 0;
   font: inherit;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  color: #9CA3AF;
+}
+
+.datasets-button:hover {
+  color: #C1A15A;
 }
 
 .dropdown-icon {
@@ -59,19 +70,25 @@
   transition: transform 0.2s ease;
 }
 
-.dropdown-container:hover .dropdown-icon {
-  transform: rotate(180deg);
-}
-
 .dropdown-menu {
   position: absolute;
-  top: 100%;
+  top: calc(100% - 0.5rem);
+  left: 50%;
+  transform: translateX(-50%);
   background-color: #1D1F21;
   border: 1px solid #2D3748;
   border-radius: 0.5rem;
   padding: 0.5rem 0;
   min-width: 200px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.dropdown-container:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
 }
 
 .dropdown-item {
