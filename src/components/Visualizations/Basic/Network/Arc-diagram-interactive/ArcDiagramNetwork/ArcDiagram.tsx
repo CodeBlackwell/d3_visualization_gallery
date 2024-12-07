@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import useArcDiagram from '../hooks/useArcDiagram';
-import { ARC_CONFIG, VISUALIZATIONS } from '../../../../../constants/visualizationConfig';
+import { ARC_CONFIG, VISUALIZATIONS } from '../../../../../../../src/constants/visualizationConfig';
 import './ArcDiagram.css';
 
 interface ArcDiagramProps {

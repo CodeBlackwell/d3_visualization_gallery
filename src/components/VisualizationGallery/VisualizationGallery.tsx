@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ArcDiagram from '../Basic/Network/Arc-diagram-interactive/ArcDiagramNetwork/ArcDiagram';
+import ArcDiagram from '../Visualizations/Basic/Network/Arc-diagram-interactive/ArcDiagramNetwork/ArcDiagram';
 import VisualizationMenu from '../VisualizationMenu/VisualizationMenu';
 import { VISUALIZATIONS } from '../../constants/visualizationConfig';
 import './VisualizationGallery.css';
