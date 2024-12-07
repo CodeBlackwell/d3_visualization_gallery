@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ArcDiagram from '../Visualizations/Basic/Network/Arc-diagram-interactive/ArcDiagramNetwork/ArcDiagram';
 import WorldMap from '../Visualizations/Basic/WorldMap/Projection2D/WorldMap';
+import Scatterplot from '../Visualizations/Basic/Scatterplot/Scatterplot';
 import DatasetExploration from '../shared/DatasetExploration/DatasetExploration';
 import { VISUALIZATIONS } from '../../constants/visualizationConfig';
 import './../DatasetExploration/DatasetExploration.css'; // Reusable component styles
@@ -21,6 +22,18 @@ const galleryConfig = {
       title: "World Map",
       description: "2D world map projection showing geographical data",
       component: <WorldMap />
+    },
+    {
+      type: 'scatter',
+      title: "Scatterplot",
+      description: "Interactive scatterplot visualization with D3.js",
+      component: <Scatterplot 
+        dataUrl="https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/2_TwoNum.csv"
+        width={800}
+        height={500}
+        xLabel="Living Area"
+        yLabel="Sale Price"
+      />
     },
     {
       type: 'force',

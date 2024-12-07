@@ -1,5 +1,5 @@
 // Available visualizations
-import { Visualization, ArcConfig, WorldMapConfig } from '../types/visualization';
+import { Visualization, ArcConfig, WorldMapConfig, ScatterplotConfig } from '../types/visualization';
 
 export const VISUALIZATIONS: Visualization[] = [
   {
@@ -13,6 +13,12 @@ export const VISUALIZATIONS: Visualization[] = [
     name: 'World Map',
     description: 'Interactive world map visualization using D3.js and TopoJSON',
     dataUrl: 'https://unpkg.com/world-atlas@2/countries-110m.json',
+  },
+  {
+    id: 'scatter',
+    name: 'Scatterplot',
+    description: 'Interactive scatterplot visualization with D3.js',
+    dataUrl: 'https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/2_TwoNum.csv',
   },
   // Add more visualizations here
 ];
@@ -55,6 +61,32 @@ export const WORLD_MAP_CONFIG: WorldMapConfig = {
       hoverFill: '#a0a0a0',
       stroke: '#ffffff',
       strokeWidth: 0.5
+    }
+  }
+};
+
+// Scatterplot specific config
+export const SCATTER_CONFIG: ScatterplotConfig = {
+  dimensions: {
+    margin: { top: 20, right: 30, bottom: 40, left: 40 },
+    width: 800,
+    height: 500
+  },
+  styles: {
+    point: {
+      radius: 4,
+      defaultOpacity: 0.7,
+      hoverOpacity: 1,
+      defaultColor: '#69b3a2',
+      hoverColor: '#2a9d8f'
+    },
+    axis: {
+      fontSize: 12,
+      color: '#666'
+    },
+    grid: {
+      color: '#ddd',
+      opacity: 0.1
     }
   }
 };
