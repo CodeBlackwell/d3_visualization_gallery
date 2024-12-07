@@ -3,37 +3,34 @@ import './VisualizationMenu.css';
 
 interface Visualization {
   id: string;
-  name: string;
-  description: string;
+  title: string;
 }
 
 interface VisualizationMenuProps {
   visualizations: Visualization[];
   selectedViz: string;
-  onSelect: (id: string) => void;
+  onSelect: (vizId: string) => void;
 }
 
-const VisualizationMenu: React.FC<VisualizationMenuProps> = ({ 
-  visualizations, 
-  selectedViz, 
-  onSelect 
+const VisualizationMenu: React.FC<VisualizationMenuProps> = ({
+  visualizations,
+  selectedViz,
+  onSelect,
 }) => {
   return (
     <div className="visualization-menu">
-      <select 
-        value={selectedViz} 
+      <select
+        value={selectedViz}
         onChange={(e) => onSelect(e.target.value)}
+        aria-label="Select visualization"
         className="visualization-select"
       >
-        {visualizations.map(viz => (
+        {visualizations.map((viz) => (
           <option key={viz.id} value={viz.id}>
-            {viz.name}
+            {viz.title}
           </option>
         ))}
       </select>
-      <div className="visualization-description">
-        {visualizations.find(viz => viz.id === selectedViz)?.description}
-      </div>
     </div>
   );
 };

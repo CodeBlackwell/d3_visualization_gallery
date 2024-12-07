@@ -29,23 +29,28 @@ body {
 }
 
 #root {
-  height: 100vh;
+  min-height: 100vh;
   background: var(--color-background);
+  display: flex;
+  flex-direction: column;
 }
 
 .app {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  flex: 1;
   background: var(--color-background);
+  overflow-y: auto;
+  height: 100vh;
 }
 
 .main-content {
   flex: 1;
   display: flex;
-  min-height: 0;
   background: var(--color-background);
   width: 100%;
+  padding-top: 60px; /* Adjust this value to match your header height */
+  overflow-y: auto;
 }
 
 .main-content > * {

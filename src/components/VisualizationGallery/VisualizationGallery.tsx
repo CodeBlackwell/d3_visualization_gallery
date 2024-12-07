@@ -1,105 +1,65 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ArcDiagram from '../Visualizations/Basic/Network/Arc-diagram-interactive/ArcDiagramNetwork/ArcDiagram';
 import WorldMap from '../Visualizations/Basic/WorldMap/Projection2D/WorldMap';
-import VisualizationMenu from '../VisualizationMenu/VisualizationMenu';
-import VisualizationContainer from '../shared/VisualizationContainer/VisualizationContainer';
+import DatasetExploration from '../shared/DatasetExploration/DatasetExploration';
 import { VISUALIZATIONS } from '../../constants/visualizationConfig';
 import './VisualizationGallery.css';
+
+const galleryConfig = {
+  title: "D3 Visualization Gallery",
+  description: "A curated collection of interactive data visualizations built with D3.js",
+  visualizations: [
+    {
+      type: 'arc',
+      title: "Arc Diagram",
+      description: "Arc diagram visualization of researcher connections using D3.js",
+      component: <ArcDiagram />
+    },
+    {
+      type: 'world-map',
+      title: "World Map",
+      description: "2D world map projection showing geographical data",
+      component: <WorldMap />
+    },
+    {
+      type: 'force',
+      title: "Force-Directed Graph",
+      description: "Coming soon!",
+      component: <div className="coming-soon">
+        <h3>Force-Directed Graph</h3>
+        <p>This visualization is coming soon!</p>
+      </div>
+    },
+    {
+      type: 'tree',
+      title: "Tree Layout",
+      description: "Coming soon!",
+      component: <div className="coming-soon">
+        <h3>Tree Layout</h3>
+        <p>This visualization is coming soon!</p>
+      </div>
+    }
+  ]
+};
 
 const VisualizationGallery: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [selectedViz, setSelectedViz] = useState<string>(id || VISUALIZATIONS[0].id);
 
-  useEffect(() => {
-    if (id && id !== selectedViz) {
-      setSelectedViz(id);
-    }
-  }, [id]);
+  // Find the index of the visualization based on the URL parameter
+  const initialIndex = id ? galleryConfig.visualizations.findIndex(viz => viz.type === id) : 0;
 
-  const handleVisualizationChange = (newViz: string) => {
-    setSelectedViz(newViz);
-    navigate(`/visualization/${newViz}`);
+  // Create a wrapped config that includes the navigation logic
+  const wrappedConfig = {
+    ...galleryConfig,
+    visualizations: galleryConfig.visualizations.map((viz, index) => ({
+      ...viz,
+      onClick: () => navigate(`/visualization/${viz.type}`)
+    }))
   };
 
-  const renderVisualization = (): React.ReactNode => {
-    switch (selectedViz) {
-      case 'arc':
-        return (
-          <VisualizationContainer
-            title="Arc Diagram"
-            description="Arc diagram visualization of researcher connections using D3.js"
-          >
-            <ArcDiagram />
-          </VisualizationContainer>
-        );
-      case 'world-map':
-        return (
-          <VisualizationContainer
-            title="World Map"
-            description="2D world map projection showing geographical data"
-          >
-            <WorldMap />
-          </VisualizationContainer>
-        );
-      case 'force':
-        return (
-          <VisualizationContainer
-            title="Force-Directed Graph"
-            description="Coming soon!"
-          >
-            <div className="coming-soon">
-              <h3>Force-Directed Graph</h3>
-              <p>Coming soon! This visualization will show interactive network relationships.</p>
-            </div>
-          </VisualizationContainer>
-        );
-      case 'tree':
-        return (
-          <VisualizationContainer
-            title="Tree Visualization"
-            description="Coming soon!"
-          >
-            <div className="coming-soon">
-              <h3>Tree Visualization</h3>
-              <p>Coming soon! This visualization will display hierarchical data with collapsible nodes.</p>
-            </div>
-          </VisualizationContainer>
-        );
-      case 'bubble':
-        return (
-          <VisualizationContainer
-            title="Bubble Chart"
-            description="Coming soon!"
-          >
-            <div className="coming-soon">
-              <h3>Bubble Chart</h3>
-              <p>Coming soon! This visualization will show data proportions with interactive tooltips.</p>
-            </div>
-          </VisualizationContainer>
-        );
-      default:
-        return (
-          <div className="no-visualization">
-            <p>Select a visualization from the menu above</p>
-          </div>
-        );
-    }
-  };
-
-  return (
-    <div className="visualization-gallery">
-      <VisualizationMenu 
-        visualizations={VISUALIZATIONS}
-        selectedViz={selectedViz}
-        onSelect={handleVisualizationChange}
-      />
-      <div className="visualization-display">
-        {renderVisualization()}
-      </div>
-    </div>
-  );
+  return <DatasetExploration config={wrappedConfig} initialVisualization={initialIndex} />;
 };
 
 export default VisualizationGallery;

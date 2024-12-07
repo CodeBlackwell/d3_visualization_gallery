@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DataSetExplorationVisualizationContainer from '../DataSetExplorationVisualizationContainer/DataSetExplorationVisualizationContainer';
 import './DatasetExploration.css';
 
@@ -7,6 +7,7 @@ export interface Visualization {
   title: string;
   description: string;
   component?: React.ReactNode;
+  onClick?: () => void;
 }
 
 export interface DatasetConfig {
@@ -17,10 +18,20 @@ export interface DatasetConfig {
 
 interface DatasetExplorationProps {
   config: DatasetConfig;
+  initialVisualization?: number;
 }
 
-const DatasetExploration: React.FC<DatasetExplorationProps> = ({ config }) => {
-  const [selectedViz, setSelectedViz] = useState<number>(0);
+const DatasetExploration: React.FC<DatasetExplorationProps> = ({ config, initialVisualization = 0 }) => {
+  const [selectedViz, setSelectedViz] = useState<number>(initialVisualization);
+
+  useEffect(() => {
+    setSelectedViz(initialVisualization);
+  }, [initialVisualization]);
+
+  const handleVisualizationClick = (index: number) => {
+    setSelectedViz(index);
+    config.visualizations[index].onClick?.();
+  };
 
   return (
     <div className="dataset-exploration">
@@ -37,7 +48,7 @@ const DatasetExploration: React.FC<DatasetExplorationProps> = ({ config }) => {
               <li 
                 key={index}
                 className={`visualization-item ${selectedViz === index ? 'active' : ''}`}
-                onClick={() => setSelectedViz(index)}
+                onClick={() => handleVisualizationClick(index)}
               >
                 <h3>{viz.title}</h3>
                 <p>{viz.description}</p>
