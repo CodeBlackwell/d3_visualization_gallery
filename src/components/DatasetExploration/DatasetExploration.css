@@ -10,7 +10,7 @@
   text-align: center;
 }
 
-.dataset-header h1 {
+.dataset-header h3 {
   color: var(--color-primary);
   margin-bottom: 1rem;
 }

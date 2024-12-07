@@ -14,10 +14,6 @@ const DataSetExplorationVisualizationContainer: React.FC<DataSetExplorationVisua
 }) => {
   return (
     <div className="dataset-visualization-container">
-      <div className="dataset-visualization-header">
-        <h2>{title}</h2>
-        <p>{description}</p>
-      </div>
       <div className="dataset-visualization-content">
         {children || (
           <div className="visualization-placeholder">

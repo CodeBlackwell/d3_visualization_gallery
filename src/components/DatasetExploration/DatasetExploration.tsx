@@ -53,10 +53,6 @@ const DatasetExploration: React.FC = () => {
 
   return (
     <div className="dataset-exploration">
-      <div className="dataset-header">
-        <h1>{dataset.title}</h1>
-        <p className="dataset-description">{dataset.description}</p>
-      </div>
       
       <div className="dataset-content">
         <div className="visualization-sidebar">
