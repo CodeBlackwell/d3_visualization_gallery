@@ -106,6 +106,100 @@ npm run dev
 - Ensure responsive design
 - Add smooth transitions for interactions
 
+## 🔧 Adding New Visualizations
+
+To add a new visualization to the gallery, follow these steps:
+
+### 1. Create the Visualization Component
+
+Create a new directory under `src/components/Visualizations/Basic/` with your visualization name:
+
+```
+src/components/Visualizations/Basic/
+└── YourVisualization/
+    ├── YourVisualization.tsx      # Main component
+    ├── YourVisualization.css      # Styles
+    └── hooks/
+        └── useYourVisualization.ts # D3.js logic
+```
+
+### 2. Configure the Visualization
+
+Add your visualization to `src/constants/visualizationConfig.ts`:
+
+```typescript
+export const VISUALIZATIONS: Visualization[] = [
+  // ... existing visualizations
+  {
+    id: 'your-visualization-id',
+    name: 'Your Visualization Name',
+    description: 'Brief description of your visualization',
+    dataUrl: 'URL to your data source if applicable',
+  },
+];
+
+// Add configuration if needed
+export const YOUR_VIZ_CONFIG: YourVizConfig = {
+  dimensions: {
+    margin: { top: 20, right: 20, bottom: 20, left: 20 },
+    width: 800,
+    height: 600
+  },
+  styles: {
+    // Your visualization-specific styles
+  }
+};
+```
+
+### 3. Add TypeScript Types
+
+Define your visualization's types in `src/types/visualization.ts`:
+
+```typescript
+export interface YourVizConfig {
+  dimensions: {
+    margin: { top: number; right: number; bottom: number; left: number };
+    width: number;
+    height: number;
+  };
+  styles: {
+    // Your visualization-specific style types
+  };
+}
+```
+
+### 4. Register in the Gallery
+
+Add your visualization to the switch statement in `src/components/VisualizationGallery/VisualizationGallery.tsx`:
+
+```typescript
+import YourVisualization from '../Visualizations/Basic/YourVisualization/YourVisualization';
+
+// In the renderVisualization function:
+case 'your-visualization-id':
+  return <YourVisualization />;
+```
+
+### 5. Best Practices
+
+- Use TypeScript for type safety
+- Implement error handling for data loading
+- Add loading states and error messages
+- Make the visualization responsive
+- Follow the existing component structure:
+  - Use a custom hook for D3.js logic
+  - Keep the React component clean
+  - Separate styles into a CSS file
+  - Add proper cleanup in useEffect hooks
+
+### 6. Testing
+
+- Add your visualization to the test suite
+- Test with different screen sizes
+- Verify error handling
+- Check memory leaks with React DevTools
+- Test data loading states
+
 ## 🎨 Color Palette
 
 ```css
