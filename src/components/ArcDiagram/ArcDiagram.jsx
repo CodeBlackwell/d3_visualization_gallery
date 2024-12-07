@@ -1,13 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import useNetworkVisualization from '../../hooks/useNetworkVisualization';
+import useArcDiagram from '../../hooks/useArcDiagram';
 import { VISUALIZATIONS } from '../../constants/visualizationConfig';
-import './NetworkVisualization.css';
+import './ArcDiagram.css';
 
-const NetworkVisualization = ({ className }) => {
+const ArcDiagram = ({ className }) => {
   const containerRef = useRef(null);
-  const { createVisualization } = useNetworkVisualization();
-  const config = VISUALIZATIONS.find(viz => viz.id === 'network');
+  const { createVisualization } = useArcDiagram();
+  const config = VISUALIZATIONS.find(viz => viz.id === 'arc');
 
   useEffect(() => {
     if (containerRef.current && config) {
@@ -33,14 +33,14 @@ const NetworkVisualization = ({ className }) => {
     <div className={`visualization-container ${className || ''}`}>
       <div 
         ref={containerRef}
-        className="network-visualization"
+        className="arc-diagram"
       />
     </div>
   );
 };
 
-NetworkVisualization.propTypes = {
+ArcDiagram.propTypes = {
   className: PropTypes.string
 };
 
-export default NetworkVisualization;
+export default ArcDiagram;

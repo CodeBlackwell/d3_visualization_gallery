@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
 import * as d3 from 'd3';
-import { NETWORK_CONFIG } from '../constants/visualizationConfig';
+import { ARC_CONFIG } from '../constants/visualizationConfig';
 
-const useNetworkVisualization = () => {
+const useArcDiagram = () => {
   const createVisualization = useCallback(async (containerRef, config) => {
     try {
       const container = d3.select(containerRef);
@@ -24,7 +24,7 @@ const useNetworkVisualization = () => {
       // Clear previous content
       container.selectAll('*').remove();
 
-      const { margin, width, height } = NETWORK_CONFIG.dimensions;
+      const { margin, width, height } = ARC_CONFIG.dimensions;
 
       // Create the SVG container
       const svg = container
@@ -76,8 +76,8 @@ const useNetworkVisualization = () => {
                 ].join(' ');
         })
         .style('fill', 'none')
-        .attr('stroke', NETWORK_CONFIG.styles.link.defaultColor)
-        .style('stroke-width', NETWORK_CONFIG.styles.link.defaultWidth);
+        .attr('stroke', ARC_CONFIG.styles.link.defaultColor)
+        .style('stroke-width', ARC_CONFIG.styles.link.defaultWidth);
 
       // Add the nodes
       const nodes = svg
@@ -104,34 +104,34 @@ const useNetworkVisualization = () => {
         .text(d => d.name)
         .style('text-anchor', 'end')
         .attr('transform', d => `translate(${x(d.name)}, ${height - 15})rotate(-45)`)
-        .style('font-size', NETWORK_CONFIG.styles.label.defaultSize);
+        .style('font-size', ARC_CONFIG.styles.label.defaultSize);
 
       // Add interactions
       nodes
         .on('mouseover', function (event, d) {
-          nodes.style('opacity', NETWORK_CONFIG.styles.node.dimmedOpacity);
-          d3.select(this).style('opacity', NETWORK_CONFIG.styles.node.defaultOpacity);
+          nodes.style('opacity', ARC_CONFIG.styles.node.dimmedOpacity);
+          d3.select(this).style('opacity', ARC_CONFIG.styles.node.defaultOpacity);
 
           links
-            .style('stroke', link_d => link_d.source === d.id || link_d.target === d.id ? color(d.grp) : NETWORK_CONFIG.styles.link.highlightColor)
+            .style('stroke', link_d => link_d.source === d.id || link_d.target === d.id ? color(d.grp) : ARC_CONFIG.styles.link.highlightColor)
             .style('stroke-opacity', link_d => link_d.source === d.id || link_d.target === d.id ? 1 : 0.2)
-            .style('stroke-width', link_d => link_d.source === d.id || link_d.target === d.id ? NETWORK_CONFIG.styles.link.highlightWidth : NETWORK_CONFIG.styles.link.defaultWidth);
+            .style('stroke-width', link_d => link_d.source === d.id || link_d.target === d.id ? ARC_CONFIG.styles.link.highlightWidth : ARC_CONFIG.styles.link.defaultWidth);
 
           labels
-            .style('font-size', label_d => label_d.name === d.name ? NETWORK_CONFIG.styles.label.highlightSize : NETWORK_CONFIG.styles.label.defaultSize)
+            .style('font-size', label_d => label_d.name === d.name ? ARC_CONFIG.styles.label.highlightSize : ARC_CONFIG.styles.label.defaultSize)
             .attr('y', label_d => label_d.name === d.name ? 10 : 0);
         })
         .on('mouseout', function () {
-          nodes.style('opacity', NETWORK_CONFIG.styles.node.defaultOpacity);
+          nodes.style('opacity', ARC_CONFIG.styles.node.defaultOpacity);
           links
-            .style('stroke', NETWORK_CONFIG.styles.link.defaultColor)
+            .style('stroke', ARC_CONFIG.styles.link.defaultColor)
             .style('stroke-opacity', 0.8)
-            .style('stroke-width', NETWORK_CONFIG.styles.link.defaultWidth);
-          labels.style('font-size', NETWORK_CONFIG.styles.label.defaultSize);
+            .style('stroke-width', ARC_CONFIG.styles.link.defaultWidth);
+          labels.style('font-size', ARC_CONFIG.styles.label.defaultSize);
         });
 
     } catch (error) {
-      console.error('Error creating network visualization:', error);
+      console.error('Error creating arc diagram:', error);
       const container = d3.select(containerRef);
       if (container) {
         container.html('');
@@ -149,4 +149,4 @@ const useNetworkVisualization = () => {
   return { createVisualization };
 };
 
-export default useNetworkVisualization;
+export default useArcDiagram;

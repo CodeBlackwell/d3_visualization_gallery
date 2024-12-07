@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import NetworkVisualization from '../NetworkVisualization/NetworkVisualization';
+import ArcDiagram from '../ArcDiagram/ArcDiagram';
 import VisualizationMenu from '../VisualizationMenu/VisualizationMenu';
 import { VISUALIZATIONS } from '../../constants/visualizationConfig';
 import './VisualizationGallery.css';
@@ -9,8 +9,8 @@ const VisualizationGallery = () => {
 
   const renderVisualization = () => {
     switch (selectedViz) {
-      case 'network':
-        return <NetworkVisualization />;
+      case 'arc':
+        return <ArcDiagram />;
       // Add more cases for other visualizations
       default:
         return <div>Select a visualization</div>;

@@ -1,16 +1,16 @@
 // Available visualizations
 export const VISUALIZATIONS = [
   {
-    id: 'network',
-    name: 'Network Visualization',
-    description: 'Network visualization of researcher connections using D3.js',
+    id: 'arc',
+    name: 'Arc Diagram',
+    description: 'Arc diagram visualization of researcher connections using D3.js',
     dataUrl: 'https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_researcherNetwork.json',
   },
   // Add more visualizations here
 ];
 
-// Network visualization specific config
-export const NETWORK_CONFIG = {
+// Arc diagram specific config
+export const ARC_CONFIG = {
   dimensions: {
     margin: { top: 0, right: 30, bottom: 50, left: 60 },
     width: 650,
