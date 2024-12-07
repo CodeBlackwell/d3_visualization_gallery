@@ -3,15 +3,19 @@ import * as d3 from 'd3';
 import { NETWORK_CONFIG } from '../constants/visualizationConfig';
 
 const useNetworkVisualization = () => {
-  const createVisualization = useCallback(async (containerRef) => {
+  const createVisualization = useCallback(async (containerRef, config) => {
     try {
       const container = d3.select(containerRef);
       if (!container) {
         throw new Error('No container provided');
       }
 
+      if (!config?.dataUrl) {
+        throw new Error('No data URL provided in configuration');
+      }
+
       // Load the network data
-      const response = await fetch(NETWORK_CONFIG.dataUrl);
+      const response = await fetch(config.dataUrl);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -72,8 +76,8 @@ const useNetworkVisualization = () => {
                 ].join(' ');
         })
         .style('fill', 'none')
-        .attr('stroke', 'grey')
-        .style('stroke-width', 1);
+        .attr('stroke', NETWORK_CONFIG.styles.link.defaultColor)
+        .style('stroke-width', NETWORK_CONFIG.styles.link.defaultWidth);
 
       // Add the nodes
       const nodes = svg
@@ -100,30 +104,30 @@ const useNetworkVisualization = () => {
         .text(d => d.name)
         .style('text-anchor', 'end')
         .attr('transform', d => `translate(${x(d.name)}, ${height - 15})rotate(-45)`)
-        .style('font-size', 6);
+        .style('font-size', NETWORK_CONFIG.styles.label.defaultSize);
 
       // Add interactions
       nodes
         .on('mouseover', function (event, d) {
-          nodes.style('opacity', 0.2);
-          d3.select(this).style('opacity', 1);
+          nodes.style('opacity', NETWORK_CONFIG.styles.node.dimmedOpacity);
+          d3.select(this).style('opacity', NETWORK_CONFIG.styles.node.defaultOpacity);
 
           links
-            .style('stroke', link_d => link_d.source === d.id || link_d.target === d.id ? color(d.grp) : '#b8b8b8')
+            .style('stroke', link_d => link_d.source === d.id || link_d.target === d.id ? color(d.grp) : NETWORK_CONFIG.styles.link.highlightColor)
             .style('stroke-opacity', link_d => link_d.source === d.id || link_d.target === d.id ? 1 : 0.2)
-            .style('stroke-width', link_d => link_d.source === d.id || link_d.target === d.id ? 4 : 1);
+            .style('stroke-width', link_d => link_d.source === d.id || link_d.target === d.id ? NETWORK_CONFIG.styles.link.highlightWidth : NETWORK_CONFIG.styles.link.defaultWidth);
 
           labels
-            .style('font-size', label_d => label_d.name === d.name ? 16 : 2)
+            .style('font-size', label_d => label_d.name === d.name ? NETWORK_CONFIG.styles.label.highlightSize : NETWORK_CONFIG.styles.label.defaultSize)
             .attr('y', label_d => label_d.name === d.name ? 10 : 0);
         })
         .on('mouseout', function () {
-          nodes.style('opacity', 1);
+          nodes.style('opacity', NETWORK_CONFIG.styles.node.defaultOpacity);
           links
-            .style('stroke', 'grey')
+            .style('stroke', NETWORK_CONFIG.styles.link.defaultColor)
             .style('stroke-opacity', 0.8)
-            .style('stroke-width', 1);
-          labels.style('font-size', 6);
+            .style('stroke-width', NETWORK_CONFIG.styles.link.defaultWidth);
+          labels.style('font-size', NETWORK_CONFIG.styles.label.defaultSize);
         });
 
     } catch (error) {

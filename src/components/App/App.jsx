@@ -1,15 +1,15 @@
 import React from 'react';
-import NetworkVisualization from '../NetworkVisualization/NetworkVisualization';
+import VisualizationGallery from '../VisualizationGallery/VisualizationGallery';
 import './App.css';
 
 function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>React D3 Visualization</h1>
+        <h1>D3 Visualization Gallery</h1>
       </header>
       <main className="app-main">
-        <NetworkVisualization />
+        <VisualizationGallery />
       </main>
     </div>
   );

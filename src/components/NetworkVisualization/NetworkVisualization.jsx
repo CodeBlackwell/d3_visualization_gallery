@@ -1,15 +1,17 @@
 import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import useNetworkVisualization from '../../hooks/useNetworkVisualization';
+import { VISUALIZATIONS } from '../../constants/visualizationConfig';
 import './NetworkVisualization.css';
 
 const NetworkVisualization = ({ className }) => {
   const containerRef = useRef(null);
   const { createVisualization } = useNetworkVisualization();
+  const config = VISUALIZATIONS.find(viz => viz.id === 'network');
 
   useEffect(() => {
-    if (containerRef.current) {
-      createVisualization(containerRef.current);
+    if (containerRef.current && config) {
+      createVisualization(containerRef.current, config);
     }
 
     // Cleanup function
@@ -21,7 +23,11 @@ const NetworkVisualization = ({ className }) => {
         }
       }
     };
-  }, [createVisualization]);
+  }, [createVisualization, config]);
+
+  if (!config) {
+    return <div>Visualization configuration not found</div>;
+  }
 
   return (
     <div className={`visualization-container ${className || ''}`}>
