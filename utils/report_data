@@ -6,41 +6,57 @@ import os
 import csv
 from collections.abc import Mapping, Sequence
 import datetime
+import argparse
+import psutil
+import time
+import tqdm
 
 def get_type_sample(value):
     if isinstance(value, (str, int, float, bool)):
         return f"(example: {repr(value)})"
     return ""
 
-def count_elements(data):
+def count_elements(data, pbar=None):
     count = 1
     if isinstance(data, dict):
+        if pbar:
+            pbar.update(1)
         for value in data.values():
-            count += count_elements(value)
+            count += count_elements(value, pbar)
     elif isinstance(data, list):
+        if pbar:
+            pbar.update(1)
         for item in data:
-            count += count_elements(item)
+            count += count_elements(item, pbar)
+    elif pbar:
+        pbar.update(1)
     return count
 
-def extract_structure(data, indent=0, max_array_items=3):
+def extract_structure(data, indent=0, max_array_items=3, pbar=None):
     prefix = ' ' * indent
     structure = ""
 
     if isinstance(data, dict):
+        if pbar:
+            pbar.update(1)
         structure += f"{prefix}Object ({len(data)} keys)\n"
         for key, value in data.items():
             structure += f"{prefix}  {key}:\n"
-            structure += extract_structure(value, indent + 4)
+            structure += extract_structure(value, indent + 4, max_array_items, pbar)
     elif isinstance(data, list):
+        if pbar:
+            pbar.update(1)
         structure += f"{prefix}Array (length: {len(data)})\n"
         if len(data) > 0:
             sample_size = min(max_array_items, len(data))
             for i in range(sample_size):
                 structure += f"{prefix}  Item {i}:\n"
-                structure += extract_structure(data[i], indent + 4)
+                structure += extract_structure(data[i], indent + 4, max_array_items, pbar)
             if len(data) > max_array_items:
                 structure += f"{prefix}  ... ({len(data) - max_array_items} more items)\n"
     else:
+        if pbar:
+            pbar.update(1)
         sample = get_type_sample(data)
         structure += f"{prefix}{type(data).__name__} {sample}\n"
 
@@ -67,8 +83,26 @@ def detect_type(value):
                         return "bool"
                     return "str"
 
-def analyze_delimited_file(file_path, delimiter=','):
+def get_memory_usage():
+    process = psutil.Process()
+    return process.memory_info().rss / 1024 / 1024  # Convert to MB
+
+def write_output(message, file=None, verbose_only=False, verbose=False):
+    if verbose_only and not verbose:
+        return
+    print(message)
+    if file:
+        print(message, file=file)
+
+def analyze_delimited_file(file_path, delimiter=',', output_file=None, verbose=False):
+    start_time = time.time()
+    initial_memory = get_memory_usage()
+    
     try:
+        # First pass to count rows
+        with open(file_path, 'r') as f:
+            total_rows = sum(1 for _ in f) - 1  # Subtract 1 for header
+
         file_size = os.path.getsize(file_path)
         with open(file_path, 'r') as f:
             reader = csv.reader(f, delimiter=delimiter)
@@ -77,13 +111,27 @@ def analyze_delimited_file(file_path, delimiter=','):
             sample_rows = []
             column_types = [set() for _ in range(len(headers))] if headers else []
 
-            for row in reader:
-                row_count += 1
-                if len(sample_rows) < 3:
-                    sample_rows.append(row)
-                for i, value in enumerate(row):
-                    detected_type = detect_type(value)
-                    column_types[i].add(detected_type)
+            write_output(f"Reading file contents...", output_file, verbose_only=True, verbose=verbose)
+            
+            # Create progress bar
+            pbar = tqdm.tqdm(total=total_rows, desc=f"Processing rows (Memory: {initial_memory:.2f} MB)", 
+                           disable=not verbose, position=0, leave=True)
+            
+            try:
+                for row in reader:
+                    row_count += 1
+                    if len(sample_rows) < 3:
+                        sample_rows.append(row)
+                    for i, value in enumerate(row):
+                        detected_type = detect_type(value)
+                        column_types[i].add(detected_type)
+                    
+                    if verbose and row_count % 10000 == 0:
+                        current_memory = get_memory_usage()
+                        pbar.set_description(f"Processing rows (Memory: {current_memory:.2f} MB)")
+                    pbar.update(1)
+            finally:
+                pbar.close()
     except FileNotFoundError:
         print(f"Error: File '{file_path}' not found")
         sys.exit(1)
@@ -91,66 +139,118 @@ def analyze_delimited_file(file_path, delimiter=','):
         print(f"Error: '{file_path}' contains invalid data: {e}")
         sys.exit(1)
 
+    end_time = time.time()
+    final_memory = get_memory_usage()
+    processing_time = end_time - start_time
+    memory_change = final_memory - initial_memory
+
     file_type = "TSV" if delimiter == '\t' else "CSV"
-    print(f"\n{file_type} File Analysis: {os.path.basename(file_path)}")
-    print(f"{'=' * 50}")
-    print(f"File Size: {file_size:,} bytes")
-    print(f"Number of Rows (excluding headers): {row_count:,}")
-    print(f"Number of Columns: {len(headers) if headers else 0}")
+    write_output(f"\n{file_type} File Analysis: {os.path.basename(file_path)}", output_file)
+    write_output(f"{'=' * 50}", output_file)
+    write_output(f"File Size: {file_size:,} bytes", output_file)
+    write_output(f"Number of Rows (excluding headers): {row_count:,}", output_file)
+    write_output(f"Number of Columns: {len(headers) if headers else 0}", output_file)
+    
     if headers:
-        print(f"Column Names: {', '.join(headers)}")
+        write_output(f"Column Names: {', '.join(headers)}", output_file)
         column_types_str = []
         for types in column_types:
             if len(types) > 1:
                 column_types_str.append(f"mixed ({', '.join(types)})")
             else:
                 column_types_str.append(next(iter(types)))
-        print(f"Column Types: {', '.join(column_types_str)}")
+        write_output(f"Column Types: {', '.join(column_types_str)}", output_file)
 
-    print("\nSample Rows:")
-    print("-" * 50)
+    write_output("\nSample Rows:", output_file)
+    write_output("-" * 50, output_file)
     for i, row in enumerate(sample_rows):
-        print(f"Row {i}: {row}")
+        write_output(f"Row {i}: {row}", output_file)
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: ./report_file <json_file_or_csv_file_or_tsv_file>")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description='Analyze JSON, CSV, or TSV files and generate a report.')
+    parser.add_argument('input_file', help='Path to the input file (JSON, CSV, or TSV)')
+    parser.add_argument('--no-report', action='store_true', help='Disable writing the report to a file')
+    parser.add_argument('--quiet', '-q', action='store_true', help='Disable verbose output')
+    args = parser.parse_args()
 
-    input_file = sys.argv[1]
+    input_file = args.input_file
     if not os.path.isfile(input_file):
         print(f"Error: File '{input_file}' not found")
         sys.exit(1)
 
-    file_extension = os.path.splitext(input_file)[1].lower()
-    if file_extension == ".json":
-        try:
-            file_size = os.path.getsize(input_file)
-            with open(input_file, 'r') as f:
-                json_data = json.load(f)
-        except FileNotFoundError:
-            print(f"Error: File '{input_file}' not found")
-            sys.exit(1)
-        except json.JSONDecodeError:
-            print(f"Error: '{input_file}' contains invalid JSON")
-            sys.exit(1)
+    output_file = None
+    if not args.no_report:
+        base_name = os.path.splitext(input_file)[0]
+        output_path = f"{base_name}_report.txt"
+        output_file = open(output_path, 'w')
 
-        print(f"\nJSON File Analysis: {os.path.basename(input_file)}")
-        print(f"{'='* 50}")
-        print(f"File Size: {file_size:,} bytes")
-        print(f"Total Elements: {count_elements(json_data):,}")
-        if isinstance(json_data, dict):
-            print(f"Root Keys: {', '.join(json_data.keys())}")
-        elif isinstance(json_data, list):
-            print(f"Root Array Length: {len(json_data)}")
+    try:
+        start_time = time.time()
+        initial_memory = get_memory_usage()
+        write_output(f"Starting analysis...", output_file, verbose_only=True, verbose=not args.quiet)
+        write_output(f"Initial memory usage: {initial_memory:.2f} MB", output_file, verbose_only=True, verbose=not args.quiet)
 
-        print("\nDetailed Structure:")
-        print("-" * 50)
-        structure = extract_structure(json_data)
-        print(structure)
-    elif file_extension in [".csv", ".tsv"]:
-        delimiter = '\t' if file_extension == ".tsv" else ','
-        analyze_delimited_file(input_file, delimiter)
-    else:
-        print(f"Error: Unsupported file format '{file_extension}'. Only .json, .csv, and .tsv are supported.")
-        sys.exit(1)
+        file_extension = os.path.splitext(input_file)[1].lower()
+        if file_extension == ".json":
+            try:
+                file_size = os.path.getsize(input_file)
+                write_output("Reading JSON file...", output_file, verbose_only=True, verbose=not args.quiet)
+                with open(input_file, 'r') as f:
+                    json_data = json.load(f)
+                current_memory = get_memory_usage()
+                write_output(f"JSON loaded into memory. Current usage: {current_memory:.2f} MB", 
+                           output_file, verbose_only=True, verbose=not args.quiet)
+                
+                # Create progress bars for JSON processing
+                write_output("Counting elements...", output_file, verbose_only=True, verbose=not args.quiet)
+                pbar1 = tqdm.tqdm(desc=f"Counting elements (Memory: {current_memory:.2f} MB)", 
+                                disable=args.quiet, position=0, leave=True)
+                try:
+                    total_elements = count_elements(json_data, pbar1)
+                finally:
+                    pbar1.close()
+                
+                current_memory = get_memory_usage()
+                write_output("Analyzing structure...", output_file, verbose_only=True, verbose=not args.quiet)
+                pbar2 = tqdm.tqdm(desc=f"Analyzing structure (Memory: {current_memory:.2f} MB)", 
+                                disable=args.quiet, position=0, leave=True)
+                try:
+                    structure = extract_structure(json_data, pbar=pbar2)
+                finally:
+                    pbar2.close()
+            except FileNotFoundError:
+                print(f"Error: File '{input_file}' not found")
+                sys.exit(1)
+            except json.JSONDecodeError:
+                print(f"Error: '{input_file}' contains invalid JSON")
+                sys.exit(1)
+
+            end_time = time.time()
+            final_memory = get_memory_usage()
+            processing_time = end_time - start_time
+            memory_change = final_memory - initial_memory
+
+            write_output(f"\nJSON File Analysis: {os.path.basename(input_file)}", output_file)
+            write_output(f"{'='* 50}", output_file)
+            write_output(f"File Size: {file_size:,} bytes", output_file)
+            write_output(f"Processing Time: {processing_time:.2f} seconds", output_file)
+            write_output(f"Memory Usage: {final_memory:.2f} MB (Change: {memory_change:+.2f} MB)", output_file)
+            write_output(f"Total Elements: {total_elements:,}", output_file)
+            if isinstance(json_data, dict):
+                write_output(f"Root Keys: {', '.join(json_data.keys())}", output_file)
+            elif isinstance(json_data, list):
+                write_output(f"Root Array Length: {len(json_data)}", output_file)
+
+            write_output("\nDetailed Structure:", output_file)
+            write_output("-" * 50, output_file)
+            write_output(structure, output_file)
+        elif file_extension in [".csv", ".tsv"]:
+            delimiter = '\t' if file_extension == ".tsv" else ','
+            analyze_delimited_file(input_file, delimiter, output_file, not args.quiet)
+        else:
+            print(f"Error: Unsupported file format '{file_extension}'. Only .json, .csv, and .tsv are supported.")
+            sys.exit(1)
+    finally:
+        if output_file:
+            output_file.close()
+            print(f"\nReport written to: {output_path}")
