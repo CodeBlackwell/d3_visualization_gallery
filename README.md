@@ -14,32 +14,62 @@ This project showcases D3.js visualizations in a modern React application, featu
 1. TypeScript integration for improved type safety and developer experience
 2. Modular component architecture for easy extension
 3. Interactive visualization gallery with configurable options
-4. Responsive design and smooth animations
+4. Dark theme with responsive design and smooth animations
 
 ## 🌟 Features
 
 - 📊 Interactive D3.js visualizations
 - 💪 Full TypeScript support
 - 🔄 React component architecture
-- 🎨 Consistent styling with CSS modules
+- 🎨 Modern dark theme with gold accents
 - 🛠️ Easy-to-use visualization selector
 - 📱 Responsive design
 - 🐛 Comprehensive error handling
 
 ## 🎬 Current Visualizations
 
-### 🌋 Volcano Contours
-- Topographic visualization of Maungawhau volcano
-- Interactive contour lines with color gradients
-- Elevation data representation
-
 ### 🔄 Arc Diagram
 - Network visualization showing researcher connections
-- Interactive node highlighting
-- Smooth transitions and animations
-- Configurable styling options
+- Interactive node highlighting with tooltips
+- Smooth transitions and hover effects
+- Dark theme with gold accent colors
+- Responsive SVG scaling
 
-*More visualizations coming soon!*
+### 🔀 Force-Directed Graph (Coming Soon)
+- Interactive network relationships
+- Dynamic force simulation
+- Node dragging and zooming capabilities
+
+### 🌳 Tree Visualization (Coming Soon)
+- Hierarchical data representation
+- Collapsible nodes for data exploration
+- Smooth transitions between states
+
+### 💫 Bubble Chart (Coming Soon)
+- Data proportion visualization
+- Interactive tooltips
+- Dynamic size scaling
+
+## 📁 Project Structure
+
+```
+src/
+├── components/
+│   ├── Basic/
+│   │   └── Network/
+│   │       └── Arc-diagram-interactive/
+│   │           ├── ArcDiagramNetwork/
+│   │           │   ├── ArcDiagram.tsx
+│   │           │   └── ArcDiagram.css
+│   │           └── hooks/
+│   │               └── useArcDiagram.ts
+│   ├── Header/
+│   ├── Footer/
+│   └── VisualizationGallery/
+├── constants/
+├── types/
+└── App.tsx
+```
 
 ## 🚀 Getting Started
 
@@ -50,10 +80,10 @@ This project showcases D3.js visualizations in a modern React application, featu
 ### Installation
 ```bash
 # Clone the repository
-git clone https://github.com/CodeBlackwell/t5d3_dataset.git
+git clone https://github.com/yourusername/d3-visualization-gallery.git
 
 # Navigate to project directory
-cd t5d3_dataset
+cd d3-visualization-gallery
 
 # Install dependencies
 npm install
@@ -62,101 +92,35 @@ npm install
 npm run dev
 ```
 
-## 🏗️ Project Structure
+## 🛠️ Development
 
+### Adding New Visualizations
+1. Create a new directory under `src/components/` for your visualization category
+2. Add your visualization component and related files
+3. Update `visualizationConfig.ts` with your new visualization details
+4. Add the visualization to the gallery renderer
+
+### Styling Guidelines
+- Use the provided color variables for consistency
+- Follow the dark theme pattern
+- Ensure responsive design
+- Add smooth transitions for interactions
+
+## 🎨 Color Palette
+
+```css
+--color-background: #1D1F21;
+--color-surface: #16181A;
+--color-primary: #C1A15A;
+--color-text: #FFFFFF;
+--color-text-secondary: #9CA3AF;
+--color-border: #2D3748;
 ```
-src/
-├── components/                # React components
-│   ├── ArcDiagram/           # Arc diagram visualization
-│   │   ├── ArcDiagram.tsx    # Main component
-│   │   └── ArcDiagram.css    # Styles
-│   └── VisualizationGallery/ # Gallery component
-├── constants/                 # Configuration constants
-│   └── visualizationConfig.ts # Visualization settings
-├── hooks/                    # Custom React hooks
-│   └── useArcDiagram.ts     # Arc diagram logic
-├── types/                    # TypeScript type definitions
-│   └── visualization.ts      # Shared types
-└── App.tsx                   # Main application
-```
-
-## 🛠️ Component Architecture
-
-### Visualization Gallery
-- Main container for all visualizations
-- Handles visualization selection and rendering
-- Manages state and configuration
-
-### Arc Diagram
-- Network visualization component
-- Uses D3.js for rendering
-- Configurable through props:
-  - Data URL
-  - Dimensions
-  - Styling options
-  - Interaction behaviors
-
-### Custom Hooks
-- `useArcDiagram`: Manages D3.js visualization lifecycle
-- Handles:
-  - Data fetching
-  - SVG creation
-  - Animations
-  - Event handling
-  - Cleanup
-
-## 🎨 Styling
-
-- CSS modules for component-specific styling
-- Consistent theme across visualizations
-- Responsive design patterns
-- Smooth transitions and animations
-
-## 🔧 Configuration
-
-Visualizations are configured through `visualizationConfig.ts`:
-```typescript
-export const VISUALIZATIONS: Visualization[] = [
-  {
-    id: 'arc',
-    name: 'Arc Diagram',
-    description: 'Network visualization...',
-    dataUrl: '...'
-  }
-];
-
-export const ARC_CONFIG: ArcConfig = {
-  dimensions: { ... },
-  styles: { ... }
-};
-```
-
-## 📚 Documentation
-
-- [D3.js Documentation](https://d3js.org/)
-- [React Documentation](https://reactjs.org/)
-- [TypeScript Documentation](https://www.typescriptlang.org/)
-- [Vite Guide](https://vitejs.dev/guide/)
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
 
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## 🤝 Contributing
 
-- [D3.js](https://d3js.org/) for the amazing visualization library
-- [React](https://reactjs.org/) for the UI framework
-- [TypeScript](https://www.typescriptlang.org/) for type safety
-- Original notebook authors and contributors
-
----
-
-<p align="center">Made with ❤️ by <a href="https://github.com/CodeBlackwell">CodeBlackwell</a></p>
+Contributions are welcome! Please feel free to submit a Pull Request.
