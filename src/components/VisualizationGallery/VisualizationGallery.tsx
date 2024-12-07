@@ -1,11 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import ArcDiagram from '../Visualizations/Basic/Network/Arc-diagram-interactive/ArcDiagramNetwork/ArcDiagram';
 import VisualizationMenu from '../VisualizationMenu/VisualizationMenu';
 import { VISUALIZATIONS } from '../../constants/visualizationConfig';
 import './VisualizationGallery.css';
 
 const VisualizationGallery: React.FC = () => {
-  const [selectedViz, setSelectedViz] = useState<string>(VISUALIZATIONS[0].id);
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [selectedViz, setSelectedViz] = useState<string>(id || VISUALIZATIONS[0].id);
+
+  useEffect(() => {
+    if (id && id !== selectedViz) {
+      setSelectedViz(id);
+    }
+  }, [id]);
+
+  const handleVisualizationChange = (newViz: string) => {
+    setSelectedViz(newViz);
+    navigate(`/visualization/${newViz}`);
+  };
 
   const renderVisualization = (): React.ReactNode => {
     switch (selectedViz) {
@@ -46,7 +60,7 @@ const VisualizationGallery: React.FC = () => {
       <VisualizationMenu 
         visualizations={VISUALIZATIONS}
         selectedViz={selectedViz}
-        onSelect={setSelectedViz}
+        onSelect={handleVisualizationChange}
       />
       <div className="visualization-container">
         {renderVisualization()}
