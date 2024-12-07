@@ -39,3 +39,19 @@ export interface ArcConfig {
   dimensions: Dimensions;
   styles: StyleConfig;
 }
+
+export interface WorldMapConfig {
+  dimensions: {
+    margin: { top: number; right: number; bottom: number; left: number };
+    width: number;
+    height: number;
+  };
+  styles: {
+    country: {
+      defaultFill: string;
+      hoverFill: string;
+      stroke: string;
+      strokeWidth: number;
+    };
+  };
+}

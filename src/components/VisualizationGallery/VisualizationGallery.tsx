@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ArcDiagram from '../Visualizations/Basic/Network/Arc-diagram-interactive/ArcDiagramNetwork/ArcDiagram';
+import WorldMap from '../Visualizations/Basic/WorldMap/Projection2D/WorldMap';
 import VisualizationMenu from '../VisualizationMenu/VisualizationMenu';
 import { VISUALIZATIONS } from '../../constants/visualizationConfig';
 import './VisualizationGallery.css';
@@ -25,6 +26,8 @@ const VisualizationGallery: React.FC = () => {
     switch (selectedViz) {
       case 'arc':
         return <ArcDiagram />;
+      case 'world-map':
+        return <WorldMap />;
       case 'force':
         return (
           <div className="coming-soon">
