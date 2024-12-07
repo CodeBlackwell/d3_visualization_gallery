@@ -1,5 +1,7 @@
 // Available visualizations
-export const VISUALIZATIONS = [
+import { Visualization, ArcConfig } from '../types/visualization';
+
+export const VISUALIZATIONS: Visualization[] = [
   {
     id: 'arc',
     name: 'Arc Diagram',
@@ -10,7 +12,7 @@ export const VISUALIZATIONS = [
 ];
 
 // Arc diagram specific config
-export const ARC_CONFIG = {
+export const ARC_CONFIG: ArcConfig = {
   dimensions: {
     margin: { top: 0, right: 30, bottom: 50, left: 60 },
     width: 650,
