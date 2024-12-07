@@ -1,5 +1,5 @@
 // Available visualizations
-import { Visualization, ArcConfig, WorldMapConfig, ScatterplotConfig } from '../types/visualization';
+import { Visualization, ArcConfig, WorldMapConfig, ScatterplotConfig, RadialChartConfig } from '../types/visualization';
 
 export const VISUALIZATIONS: Visualization[] = [
   {
@@ -20,6 +20,12 @@ export const VISUALIZATIONS: Visualization[] = [
     description: 'Interactive scatterplot visualization with D3.js',
     dataUrl: 'https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/2_TwoNum.csv',
   },
+  {
+    id: 'radial',
+    name: 'Radial Chart',
+    description: 'Interactive radial chart visualization using D3.js',
+    dataUrl: 'https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/7_OneCatOneNum.csv',
+  }
   // Add more visualizations here
 ];
 

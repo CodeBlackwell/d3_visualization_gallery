@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import ArcDiagram from '../Visualizations/Basic/Network/Arc-diagram-interactive/ArcDiagramNetwork/ArcDiagram';
 import WorldMap from '../Visualizations/Basic/WorldMap/Projection2D/WorldMap';
 import Scatterplot from '../Visualizations/Basic/Scatterplot/Scatterplot';
+import RadialChart from '../Visualizations/Basic/RadialChart/RadialChart';
 import DatasetExploration from '../shared/DatasetExploration/DatasetExploration';
 import { VISUALIZATIONS } from '../../constants/visualizationConfig';
 import './../DatasetExploration/DatasetExploration.css'; // Reusable component styles
@@ -31,8 +32,16 @@ const galleryConfig = {
         dataUrl="https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/2_TwoNum.csv"
         width={800}
         height={500}
-        xLabel="Living Area"
+        xLabel="Living Area (m^2)"
         yLabel="Sale Price"
+      />
+    },
+    {
+      type: 'radial',
+      title: "Radial Chart",
+      description: "Interactive radial chart visualization using D3.js",
+      component: <RadialChart 
+        dataUrl="https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/7_OneCatOneNum.csv"
       />
     },
     {

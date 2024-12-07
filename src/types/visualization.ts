@@ -92,3 +92,12 @@ export interface ScatterplotConfig {
     };
   };
 }
+
+export interface RadialChartConfig {
+  width?: number;
+  height?: number;
+  data?: any[];
+  dataUrl?: string;
+}
+
+export type VisualizationType = 'arc' | 'world-map' | 'scatter' | 'radial';
