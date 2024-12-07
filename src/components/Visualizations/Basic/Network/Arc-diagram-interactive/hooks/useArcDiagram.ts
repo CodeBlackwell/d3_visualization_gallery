@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import * as d3 from 'd3';
-import { Visualization } from '../types/visualization';
+import { Visualization } from '../../../../../../types/visualization';
 
 interface Node {
   id: string;
@@ -203,26 +203,67 @@ const useArcDiagram = () => {
 
       // Add interactions
       nodes
-        .on('mouseover', function (event: MouseEvent, d: Node) {
-          nodes.style('opacity', styles.node.dimmedOpacity);
+        .on('mouseover', function(this: SVGCircleElement, event: MouseEvent, d: Node) {
+          // Get all connected node IDs
+          const connectedNodes = new Set<string>();
+          connectedNodes.add(d.id);
+          
+          // Find all connected nodes through links
+          data.links.forEach(link => {
+            if (link.source === d.id) {
+              connectedNodes.add(link.target);
+            } else if (link.target === d.id) {
+              connectedNodes.add(link.source);
+            }
+          });
+
+          // Dim unconnected nodes
+          nodes.style('opacity', (node_d: Node) => 
+            connectedNodes.has(node_d.id) ? styles.node.defaultOpacity : styles.node.dimmedOpacity
+          );
+          
+          // Keep hovered node fully visible
           d3.select(this).style('opacity', styles.node.defaultOpacity);
 
+          // Highlight connected links
           links
-            .style('stroke', link_d => link_d.source === d.id || link_d.target === d.id ? color(d.grp) : styles.link.highlightColor)
-            .style('stroke-opacity', link_d => link_d.source === d.id || link_d.target === d.id ? 1 : 0.2)
-            .style('stroke-width', link_d => link_d.source === d.id || link_d.target === d.id ? styles.link.highlightWidth : styles.link.defaultWidth);
+            .style('stroke', (link_d: Link) => {
+              const isConnected = link_d.source === d.id || link_d.target === d.id;
+              return isConnected ? color(d.grp) : styles.link.highlightColor;
+            })
+            .style('stroke-opacity', (link_d: Link) => 
+              (link_d.source === d.id || link_d.target === d.id) ? 1 : 0.2
+            )
+            .style('stroke-width', (link_d: Link) => 
+              (link_d.source === d.id || link_d.target === d.id) ? 
+                styles.link.highlightWidth : styles.link.defaultWidth
+            );
 
+          // Highlight connected labels and dim others
           labels
-            .style('font-size', label_d => label_d.name === d.name ? styles.label.highlightSize : styles.label.defaultSize)
-            .attr('y', label_d => label_d.name === d.name ? 10 : 0);
+            .style('font-size', (label_d: Node) => 
+              label_d.id === d.id ? styles.label.highlightSize : styles.label.defaultSize
+            )
+            .style('opacity', (label_d: Node) => 
+              connectedNodes.has(label_d.id) ? 1 : 0.2
+            )
+            .attr('y', (label_d: Node) => 
+              label_d.id === d.id ? 10 : 0
+            );
         })
-        .on('mouseout', function () {
+        .on('mouseout', function() {
+          // Reset all elements to default state
           nodes.style('opacity', styles.node.defaultOpacity);
+          
           links
             .style('stroke', styles.link.defaultColor)
             .style('stroke-opacity', 0.8)
             .style('stroke-width', styles.link.defaultWidth);
-          labels.style('font-size', styles.label.defaultSize);
+          
+          labels
+            .style('font-size', styles.label.defaultSize)
+            .style('opacity', 1)
+            .attr('y', 0);
         });
 
       // Hide loading indicator

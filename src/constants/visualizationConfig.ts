@@ -30,8 +30,8 @@ export const ARC_CONFIG: ArcConfig = {
       dimmedOpacity: 0.2
     },
     label: {
-      defaultSize: 6,
-      highlightSize: 16
+      defaultSize: 10,
+      highlightSize: 20
     }
   }
 };
