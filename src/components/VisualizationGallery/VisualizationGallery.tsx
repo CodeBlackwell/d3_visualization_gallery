@@ -4,10 +4,10 @@ import VisualizationMenu from '../VisualizationMenu/VisualizationMenu';
 import { VISUALIZATIONS } from '../../constants/visualizationConfig';
 import './VisualizationGallery.css';
 
-const VisualizationGallery = () => {
-  const [selectedViz, setSelectedViz] = useState(VISUALIZATIONS[0].id);
+const VisualizationGallery: React.FC = () => {
+  const [selectedViz, setSelectedViz] = useState<string>(VISUALIZATIONS[0].id);
 
-  const renderVisualization = () => {
+  const renderVisualization = (): React.ReactNode => {
     switch (selectedViz) {
       case 'arc':
         return <ArcDiagram />;

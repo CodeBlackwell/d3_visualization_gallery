@@ -1,18 +1,19 @@
 import React from 'react';
+import Header from '../Header/Header';
+import Footer from '../Footer/Footer';
 import VisualizationGallery from '../VisualizationGallery/VisualizationGallery';
 import './App.css';
 
-function App() {
+const App: React.FC = () => {
   return (
     <div className="app">
-      <header className="app-header">
-        <h1>D3 Visualization Gallery</h1>
-      </header>
-      <main className="app-main">
+      <Header />
+      <main className="main-content">
         <VisualizationGallery />
       </main>
+      <Footer />
     </div>
   );
-}
+};
 
 export default App;

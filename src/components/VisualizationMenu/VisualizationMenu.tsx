@@ -1,8 +1,23 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import './VisualizationMenu.css';
 
-const VisualizationMenu = ({ visualizations, selectedViz, onSelect }) => {
+interface Visualization {
+  id: string;
+  name: string;
+  description: string;
+}
+
+interface VisualizationMenuProps {
+  visualizations: Visualization[];
+  selectedViz: string;
+  onSelect: (id: string) => void;
+}
+
+const VisualizationMenu: React.FC<VisualizationMenuProps> = ({ 
+  visualizations, 
+  selectedViz, 
+  onSelect 
+}) => {
   return (
     <div className="visualization-menu">
       <select 
@@ -21,18 +36,6 @@ const VisualizationMenu = ({ visualizations, selectedViz, onSelect }) => {
       </div>
     </div>
   );
-};
-
-VisualizationMenu.propTypes = {
-  visualizations: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      description: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-  selectedViz: PropTypes.string.isRequired,
-  onSelect: PropTypes.func.isRequired,
 };
 
 export default VisualizationMenu;
