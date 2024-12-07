@@ -20,8 +20,8 @@ interface WorldHealthMapProps {
 const WORLD_HEALTH_MAP_CONFIG: WorldMapConfig = {
   dimensions: {
     margin: { top: 20, right: 20, bottom: 60, left: 20 }, // Increased bottom margin for legend
-    width: 960,
-    height: 500
+    width: 1300, // 960 * 1.2
+    height: 800  // 500 * 1.2
   },
   styles: {
     country: {
