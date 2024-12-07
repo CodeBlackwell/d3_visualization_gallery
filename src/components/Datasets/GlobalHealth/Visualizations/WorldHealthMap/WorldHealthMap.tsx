@@ -118,7 +118,7 @@ const WorldHealthMap: React.FC<WorldHealthMapProps> = ({ className, data = [], m
               .style('stroke-width', 2);
 
             // Show tooltip
-            const tooltip = d3.select(container)
+            const tooltip = d3.select('body')
               .append('div')
               .attr('class', 'tooltip')
               .style('opacity', 0);
@@ -131,8 +131,8 @@ const WorldHealthMap: React.FC<WorldHealthMapProps> = ({ className, data = [], m
               <strong>${d.properties.name}</strong><br/>
               ${metric}: ${countryData ? countryData.value.toFixed(1) : 'No data'}
             `)
-              .style('left', (event.pageX) + 'px')
-              .style('top', (event.pageY - 28) + 'px');
+              .style('left', (event.pageX + 12) + 'px')
+              .style('top', (event.pageY - 10) + 'px');
           })
           .on('mouseout', function(event, d) {
             // Remove highlight
@@ -142,7 +142,7 @@ const WorldHealthMap: React.FC<WorldHealthMapProps> = ({ className, data = [], m
               .style('stroke-width', config.styles.country.strokeWidth);
 
             // Remove tooltip
-            d3.select(container)
+            d3.select('body')
               .selectAll('.tooltip')
               .remove();
           });
