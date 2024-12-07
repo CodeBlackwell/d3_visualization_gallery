@@ -40,16 +40,21 @@ const WorldHealthMap: React.FC<WorldHealthMapProps> = ({ className, data = [], m
     if (!containerRef.current) return;
 
     const createVisualization = async () => {
+      console.log('🎨 Starting map visualization creation...');
+      console.log('📊 Received data points:', data.length);
+      
       const container = containerRef.current!;
       const config = WORLD_HEALTH_MAP_CONFIG;
       
       // Clear any existing content
       d3.select(container).selectAll('*').remove();
+      console.log('🧹 Cleared previous visualization');
 
       const { width, height } = config.dimensions;
       const { margin } = config.dimensions;
 
       // Create SVG
+      console.log('📐 Creating SVG with dimensions:', { width, height, margin });
       const svg = d3.select(container)
         .append('svg')
         .attr('width', width + margin.left + margin.right)
@@ -61,11 +66,18 @@ const WorldHealthMap: React.FC<WorldHealthMapProps> = ({ className, data = [], m
 
       try {
         // Load world topology data
+        console.log('🌍 Loading world topology data...');
         const response = await fetch('https://unpkg.com/world-atlas@2/countries-110m.json');
+        if (!response.ok) {
+          throw new Error(`Failed to load topology: ${response.status}`);
+        }
         const topology = await response.json();
         const world = topojson.feature(topology, topology.objects.countries) as unknown as GeoJSON.FeatureCollection<GeoJSON.MultiPolygon>;
+        console.log(`🗺️ Loaded topology with ${world.features.length} countries`);
 
-        // Create color scale with a better color scheme
+        // Create color scale
+        const valueExtent = d3.extent(data, d => d.value);
+        console.log('📊 Value extent for color scale:', valueExtent);
         const colorScale = d3.scaleSequential(d3.interpolateYlOrRd)
           .domain([
             d3.min(data, d => d.value) || 0,
@@ -73,6 +85,7 @@ const WorldHealthMap: React.FC<WorldHealthMapProps> = ({ className, data = [], m
           ]);
 
         // Create projection
+        console.log('🎯 Creating map projection...');
         const projection = d3.geoMercator()
           .fitSize([width, height], world);
 
@@ -81,6 +94,7 @@ const WorldHealthMap: React.FC<WorldHealthMapProps> = ({ className, data = [], m
           .projection(projection);
 
         // Create tooltip
+        console.log('💬 Creating tooltip...');
         const tooltip = d3.select(container)
           .append('div')
           .attr('class', 'tooltip')
@@ -97,6 +111,8 @@ const WorldHealthMap: React.FC<WorldHealthMapProps> = ({ className, data = [], m
           .style('box-shadow', '0 2px 4px rgba(0,0,0,0.2)');
 
         // Draw map
+        console.log('🎨 Drawing countries...');
+        let matchedCountries = 0;
         svg.selectAll('path')
           .data(world.features)
           .enter()
@@ -105,20 +121,20 @@ const WorldHealthMap: React.FC<WorldHealthMapProps> = ({ className, data = [], m
           .attr('class', 'country')
           .style('fill', (d: any) => {
             const countryData = data.find(item => item.code === d.id);
+            if (countryData) matchedCountries++;
             return countryData ? colorScale(countryData.value) : config.styles.country.defaultFill;
           })
           .style('stroke', config.styles.country.stroke)
-          .style('stroke-width', config.styles.country.strokeWidth)
+          .style('stroke-width', config.styles.country.strokeWidth);
+
+        console.log(`🎯 Matched ${matchedCountries} countries with data out of ${world.features.length} total countries`);
+
+        // Add mouse events
+        console.log('🖱️ Adding mouse interactions...');
+        svg.selectAll('path')
           .on('mousemove', function(event, d: any) {
             const countryData = data.find(item => item.code === d.id);
             
-            // Highlight country
-            d3.select(this)
-              .transition()
-              .duration(200)
-              .style('stroke-width', 2)
-              .style('stroke', '#000');
-
             if (countryData) {
               tooltip.transition()
                 .duration(50)
@@ -132,21 +148,14 @@ const WorldHealthMap: React.FC<WorldHealthMapProps> = ({ className, data = [], m
                 .style('top', `${event.clientY - 28}px`);
             }
           })
-          .on('mouseout', function() {
-            // Reset highlight
-            d3.select(this)
-              .transition()
-              .duration(200)
-              .style('stroke-width', config.styles.country.strokeWidth)
-              .style('stroke', config.styles.country.stroke);
-
-            // Hide tooltip
+          .on('mouseout', () => {
             tooltip.transition()
               .duration(200)
               .style('opacity', 0);
           });
 
         // Add legend
+        console.log('📚 Adding legend...');
         const legendWidth = 200;
         const legendHeight = 10;
         
@@ -162,38 +171,15 @@ const WorldHealthMap: React.FC<WorldHealthMapProps> = ({ className, data = [], m
           .attr('class', 'legend')
           .attr('transform', `translate(${width - legendWidth - 20},${height - 40})`);
 
-        const defs = svg.append('defs');
-        const linearGradient = defs.append('linearGradient')
-          .attr('id', 'linear-gradient');
-
-        linearGradient.selectAll('stop')
-          .data(d3.range(0, 1.1, 0.1))
-          .enter()
-          .append('stop')
-          .attr('offset', d => d * 100 + '%')
-          .attr('stop-color', d => colorScale(d * (colorScale.domain()[1] - colorScale.domain()[0]) + colorScale.domain()[0]));
-
         legend.append('rect')
           .attr('width', legendWidth)
           .attr('height', legendHeight)
           .style('fill', 'url(#linear-gradient)');
 
-        legend.append('g')
-          .attr('transform', `translate(0,${legendHeight})`)
-          .call(legendAxis)
-          .selectAll('text')
-          .style('font-size', '10px');
-
-        legend.append('text')
-          .attr('x', legendWidth / 2)
-          .attr('y', -5)
-          .attr('text-anchor', 'middle')
-          .style('font-size', '12px')
-          .text(metric);
+        console.log('✅ Map visualization completed');
 
       } catch (error) {
-        console.error('Error creating visualization:', error);
-        // Add error message to the container
+        console.error('❌ Error creating visualization:', error);
         d3.select(container)
           .append('div')
           .attr('class', 'error-message')
