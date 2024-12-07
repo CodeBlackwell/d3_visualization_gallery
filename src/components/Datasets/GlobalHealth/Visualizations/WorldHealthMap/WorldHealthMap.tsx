@@ -40,21 +40,16 @@ const WorldHealthMap: React.FC<WorldHealthMapProps> = ({ className, data = [], m
     if (!containerRef.current) return;
 
     const createVisualization = async () => {
-      console.log('🎨 Starting map visualization creation...');
-      console.log('📊 Received data points:', data.length);
-      
       const container = containerRef.current!;
       const config = WORLD_HEALTH_MAP_CONFIG;
       
       // Clear any existing content
       d3.select(container).selectAll('*').remove();
-      console.log('🧹 Cleared previous visualization');
 
       const { width, height } = config.dimensions;
       const { margin } = config.dimensions;
 
       // Create SVG
-      console.log('📐 Creating SVG with dimensions:', { width, height, margin });
       const svg = d3.select(container)
         .append('svg')
         .attr('width', width + margin.left + margin.right)
@@ -66,26 +61,29 @@ const WorldHealthMap: React.FC<WorldHealthMapProps> = ({ className, data = [], m
 
       try {
         // Load world topology data
-        console.log('🌍 Loading world topology data...');
         const response = await fetch('https://unpkg.com/world-atlas@2/countries-110m.json');
-        if (!response.ok) {
-          throw new Error(`Failed to load topology: ${response.status}`);
-        }
         const topology = await response.json();
         const world = topojson.feature(topology, topology.objects.countries) as unknown as GeoJSON.FeatureCollection<GeoJSON.MultiPolygon>;
-        console.log(`🗺️ Loaded topology with ${world.features.length} countries`);
+
+        // Debug map features
+        console.group('🗺️ Map Feature Analysis');
+        console.log('Sample feature IDs:', world.features.slice(0, 5).map(f => ({
+            id: f.id,
+            properties: f.properties
+        })));
+        
+        // Log incoming data format
+        console.log('Sample data format:', data.slice(0, 5));
+        
+        // Track matches and mismatches
+        let matches = 0;
+        let mismatches = new Set();
 
         // Create color scale
-        const valueExtent = d3.extent(data, d => d.value);
-        console.log('📊 Value extent for color scale:', valueExtent);
         const colorScale = d3.scaleSequential(d3.interpolateYlOrRd)
-          .domain([
-            d3.min(data, d => d.value) || 0,
-            d3.max(data, d => d.value) || 100
-          ]);
+          .domain([0, d3.max(data, d => d.value) || 100]);
 
         // Create projection
-        console.log('🎯 Creating map projection...');
         const projection = d3.geoMercator()
           .fitSize([width, height], world);
 
@@ -93,26 +91,6 @@ const WorldHealthMap: React.FC<WorldHealthMapProps> = ({ className, data = [], m
         const path = d3.geoPath()
           .projection(projection);
 
-        // Create tooltip
-        console.log('💬 Creating tooltip...');
-        const tooltip = d3.select(container)
-          .append('div')
-          .attr('class', 'tooltip')
-          .style('opacity', 0)
-          .style('position', 'fixed')
-          .style('background-color', 'rgba(0, 0, 0, 0.8)')
-          .style('color', 'white')
-          .style('padding', '8px')
-          .style('border-radius', '4px')
-          .style('font-size', '12px')
-          .style('pointer-events', 'none')
-          .style('z-index', '1000')
-          .style('max-width', '200px')
-          .style('box-shadow', '0 2px 4px rgba(0,0,0,0.2)');
-
-        // Draw map
-        console.log('🎨 Drawing countries...');
-        let matchedCountries = 0;
         svg.selectAll('path')
           .data(world.features)
           .enter()
@@ -121,80 +99,123 @@ const WorldHealthMap: React.FC<WorldHealthMapProps> = ({ className, data = [], m
           .attr('class', 'country')
           .style('fill', (d: any) => {
             const countryData = data.find(item => item.code === d.id);
-            if (countryData) matchedCountries++;
+            if (countryData) {
+                matches++;
+            } else {
+                mismatches.add(d.id);
+            }
             return countryData ? colorScale(countryData.value) : config.styles.country.defaultFill;
           })
           .style('stroke', config.styles.country.stroke)
-          .style('stroke-width', config.styles.country.strokeWidth);
-
-        console.log(`🎯 Matched ${matchedCountries} countries with data out of ${world.features.length} total countries`);
-
-        // Add mouse events
-        console.log('🖱️ Adding mouse interactions...');
-        svg.selectAll('path')
-          .on('mousemove', function(event, d: any) {
+          .style('stroke-width', config.styles.country.strokeWidth)
+          .on('mouseover', function(event, d: any) {
             const countryData = data.find(item => item.code === d.id);
             
-            if (countryData) {
-              tooltip.transition()
-                .duration(50)
-                .style('opacity', 0.9);
-              
-              tooltip.html(`
-                <strong>${countryData.country}</strong><br/>
-                ${metric}: ${countryData.value.toFixed(1)}
-              `)
-                .style('left', `${event.clientX + 12}px`)
-                .style('top', `${event.clientY - 28}px`);
-            }
-          })
-          .on('mouseout', () => {
+            // Highlight country
+            d3.select(this)
+              .transition()
+              .duration(200)
+              .style('stroke-width', 2);
+
+            // Show tooltip
+            const tooltip = d3.select(container)
+              .append('div')
+              .attr('class', 'tooltip')
+              .style('opacity', 0);
+
             tooltip.transition()
               .duration(200)
-              .style('opacity', 0);
+              .style('opacity', .9);
+
+            tooltip.html(`
+              <strong>${d.properties.name}</strong><br/>
+              ${metric}: ${countryData ? countryData.value.toFixed(1) : 'No data'}
+            `)
+              .style('left', (event.pageX) + 'px')
+              .style('top', (event.pageY - 28) + 'px');
+          })
+          .on('mouseout', function(event, d) {
+            // Remove highlight
+            d3.select(this)
+              .transition()
+              .duration(200)
+              .style('stroke-width', config.styles.country.strokeWidth);
+
+            // Remove tooltip
+            d3.select(container)
+              .selectAll('.tooltip')
+              .remove();
           });
 
+        console.log(`Matched ${matches} countries`);
+        console.log('Unmatched feature IDs:', Array.from(mismatches));
+        console.groupEnd();
+
         // Add legend
-        console.log('📚 Adding legend...');
         const legendWidth = 200;
         const legendHeight = 10;
-        
+
         const legendScale = d3.scaleLinear()
           .domain(colorScale.domain())
           .range([0, legendWidth]);
 
         const legendAxis = d3.axisBottom(legendScale)
           .ticks(5)
-          .tickFormat(d => d.toFixed(1));
+          .tickFormat(d => d.toString());
 
         const legend = svg.append('g')
           .attr('class', 'legend')
-          .attr('transform', `translate(${width - legendWidth - 20},${height - 40})`);
+          .attr('transform', `translate(${(width - legendWidth) / 2},${height + 20})`);
+
+        const defs = svg.append('defs');
+        const linearGradient = defs.append('linearGradient')
+          .attr('id', 'legend-gradient')
+          .attr('x1', '0%')
+          .attr('y1', '0%')
+          .attr('x2', '100%')
+          .attr('y2', '0%');
+
+        linearGradient.selectAll('stop')
+          .data(d3.range(0, 1.1, 0.1))
+          .enter()
+          .append('stop')
+          .attr('offset', d => `${d * 100}%`)
+          .attr('stop-color', d => colorScale(d * (colorScale.domain()[1] - colorScale.domain()[0]) + colorScale.domain()[0]));
 
         legend.append('rect')
           .attr('width', legendWidth)
           .attr('height', legendHeight)
-          .style('fill', 'url(#linear-gradient)');
+          .style('fill', 'url(#legend-gradient)');
 
-        console.log('✅ Map visualization completed');
+        legend.append('g')
+          .attr('transform', `translate(0,${legendHeight})`)
+          .call(legendAxis);
+
+        legend.append('text')
+          .attr('x', legendWidth / 2)
+          .attr('y', legendHeight + 30)
+          .attr('text-anchor', 'middle')
+          .text(metric);
 
       } catch (error) {
-        console.error('❌ Error creating visualization:', error);
-        d3.select(container)
-          .append('div')
-          .attr('class', 'error-message')
-          .text('Error loading map data. Please try again later.');
+        console.error('Error loading or rendering map data:', error);
+        throw error;
       }
     };
 
     createVisualization();
+
+    return () => {
+      if (containerRef.current) {
+        containerRef.current.innerHTML = '';
+      }
+    };
   }, [data, metric]);
 
   return (
     <div 
-      ref={containerRef}
-      className={`world-health-map ${className || ''}`}
-      style={{ width: '100%', height: '100%', position: 'relative' }}
+      ref={containerRef} 
+      className={`world-health-map-container ${className || ''}`}
     />
   );
 };

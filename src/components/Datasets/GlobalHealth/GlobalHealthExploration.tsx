@@ -64,34 +64,137 @@ const GlobalHealthExploration: React.FC = () => {
 
   useEffect(() => {
     const loadData = async () => {
+      console.log('🔄 Starting data load process...');
       try {
+        console.log('📊 Fetching CSV file...');
         const response = await fetch('/root_resources/Global_health_statistics/Global Health Statistics.csv');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const csvText = await response.text();
+        console.log(`📝 CSV file loaded, size: ${(csvText.length / 1024 / 1024).toFixed(2)}MB`);
         
         // Parse CSV data
+        console.log('🔍 Parsing CSV data...');
         const parsedData = d3.csvParse(csvText) as RawHealthData[];
+        console.log(`✅ Parsed ${parsedData.length} rows of data`);
+        
+        // Debug country names and mappings
+        const uniqueCountries = [...new Set(parsedData.map((d: any) => d['Country']))];
+        console.group('🌍 Country Mapping Analysis');
+        console.log('Unique countries in data:', uniqueCountries);
+        
+        // Check mapping for each country
+        const mappingResults = uniqueCountries.map(country => ({
+          country,
+          code: countryToCode[country],
+          hasMapping: !!countryToCode[country]
+        }));
+        
+        console.log('Mapping results:', mappingResults);
+        console.log('Missing mappings:', mappingResults.filter(r => !r.hasMapping).map(r => r.country));
+        console.groupEnd();
+        
+        // Debug: Data preparation
+        console.group('🔍 Data Preparation Analysis');
+        
+        // Sample of raw data
+        console.log('Raw data sample:', parsedData.slice(0, 2));
+        
+        // Filter for year
+        const yearData = parsedData.filter(d => d.Year === selectedYear);
+        console.log(`Records for year ${selectedYear}:`, yearData.length);
+        
+        // Check country mapping
+        const sampleCountries = yearData.slice(0, 5).map(d => d['Country']);
+        console.log('Sample countries:', sampleCountries);
+        console.log('Their mappings:', sampleCountries.map(country => ({
+          country,
+          code: countryToCode[country],
+          hasMapping: !!countryToCode[country]
+        })));
+
+        // Final data transformation
+        const filteredData = yearData
+          .map(d => {
+            const code = countryToCode[d['Country']] || '';
+            const value = parseFloat(d[selectedMetric] || '0');
+            return {
+              country: d['Country'],
+              code,
+              value
+            };
+          })
+          .filter(d => !isNaN(d.value) && d.code);
+
+        console.log('Final data sample:', filteredData.slice(0, 2));
+        console.log('Final data structure:', {
+          totalRecords: filteredData.length,
+          sampleCodes: filteredData.slice(0, 5).map(d => d.code),
+          sampleValues: filteredData.slice(0, 5).map(d => d.value)
+        });
+        console.groupEnd();
         
         // Get unique years
         const uniqueYears = Array.from(new Set(parsedData.map(d => d.Year))).sort();
+        console.log(`📅 Found ${uniqueYears.length} unique years:`, uniqueYears);
         setYears(uniqueYears);
         
+        // Log unique countries for debugging
+        const uniqueCountries2 = Array.from(new Set(parsedData.map(d => d['Country'])));
+        console.log('🌍 Unique countries in data:', uniqueCountries2);
+        
         // Filter data for selected year and metric
-        const filteredData = parsedData
-          .filter(d => d.Year === selectedYear)
-          .map(d => ({
-            country: d['Country'],
-            code: countryToCode[d['Country']] || '',
-            value: parseFloat(d[selectedMetric] || '0')
-          }))
-          .filter(d => !isNaN(d.value) && d.code); // Only include countries with valid codes
+        console.log(`🎯 Filtering data for year: ${selectedYear}, metric: ${selectedMetric}`);
+        const yearDataFinal = parsedData.filter(d => d.Year === selectedYear);
+        console.log(`📊 Found ${yearDataFinal.length} records for year ${selectedYear}`);
 
-        setHealthData(filteredData);
-        setError(null);
+        // Debug country code mapping
+        const countryMappingResults = yearDataFinal.map(d => {
+          const country = d['Country'];
+          const code = countryToCode[country];
+          return { country, code, hasMapping: !!code };
+        });
+
+        console.log('🗺️ Country code mapping results:');
+        console.log('Missing mappings:', countryMappingResults.filter(r => !r.hasMapping).map(r => r.country));
+        console.log('Successful mappings:', countryMappingResults.filter(r => r.hasMapping).map(r => `${r.country} -> ${r.code}`));
+
+        const filteredDataFinal = yearDataFinal
+          .map(d => {
+            const code = countryToCode[d['Country']] || '';
+            const value = parseFloat(d[selectedMetric] || '0');
+            return {
+              country: d['Country'],
+              code,
+              value
+            };
+          })
+          .filter(d => !isNaN(d.value) && d.code);
+
+        console.log(`🗺️ Final dataset: ${filteredDataFinal.length} countries with valid data`);
+        if (filteredDataFinal.length > 0) {
+          console.log('Sample data point:', filteredDataFinal[0]);
+        }
+        console.log('📊 Value range:', {
+          min: d3.min(filteredDataFinal, d => d.value),
+          max: d3.max(filteredDataFinal, d => d.value),
+          mean: d3.mean(filteredDataFinal, d => d.value)?.toFixed(2)
+        });
+
+        if (filteredDataFinal.length === 0) {
+          console.warn('⚠️ No valid data points after filtering!');
+          setError('No valid data available for the selected year and metric.');
+        } else {
+          setHealthData(filteredDataFinal);
+          setError(null);
+        }
       } catch (err) {
-        console.error('Error loading health data:', err);
+        console.error('❌ Error loading health data:', err);
         setError('Failed to load health data. Please check the console for details.');
       } finally {
         setLoading(false);
+        console.log('🏁 Data loading process completed');
       }
     };
 
