@@ -6,6 +6,8 @@ interface DataPoint {
   x: number;
   y: number;
   category: string;
+  GrLivArea?: number;
+  SalePrice?: number;
 }
 
 interface ScatterplotProps {
@@ -38,6 +40,9 @@ export const Scatterplot: React.FC<ScatterplotProps> = ({
     const innerHeight = height - margin.top - margin.bottom;
 
     const svg = d3.select(svgRef.current);
+
+    // Remove any existing tooltips
+    d3.select('body').selectAll('.tooltip').remove();
 
     const createPlot = (plotData: DataPoint[]) => {
       // Create scales
@@ -107,7 +112,48 @@ export const Scatterplot: React.FC<ScatterplotProps> = ({
           .attr("cy", (d: DataPoint) => y(d.y))
           .attr("r", 4)
           .attr("fill", (d: DataPoint) => color(d.category))
-          .attr("opacity", 0.7);
+          .attr("opacity", 0.7)
+          .on("mouseover", (event: MouseEvent, d: DataPoint) => {
+            // Create tooltip
+            const tooltip = d3.select('body')
+              .append('div')
+              .attr('class', 'tooltip')
+              .style('opacity', 0);
+
+            // Show tooltip with transition
+            tooltip.transition()
+              .duration(200)
+              .style('opacity', .9);
+
+            tooltip.html(`
+              <strong>${xLabel}:</strong> ${d.GrLivArea?.toLocaleString() || d.x.toLocaleString()}<br/>
+              <strong>${yLabel}:</strong> ${d.SalePrice ? `$${d.SalePrice.toLocaleString()}` : d.y.toLocaleString()}
+              ${d.category !== 'default' ? `<br/><strong>Category:</strong> ${d.category}` : ''}
+            `)
+              .style('left', (event.pageX + 12) + 'px')
+              .style('top', (event.pageY - 10) + 'px');
+
+            // Highlight the point
+            d3.select(event.currentTarget as SVGCircleElement)
+              .transition()
+              .duration(200)
+              .attr('opacity', 1)
+              .attr('stroke', '#000')
+              .attr('stroke-width', 1);
+          })
+          .on("mouseout", (event) => {
+            // Remove tooltip
+            d3.select('body')
+              .selectAll('.tooltip')
+              .remove();
+
+            // Remove highlight
+            d3.select(event.currentTarget as SVGCircleElement)
+              .transition()
+              .duration(200)
+              .attr('opacity', 0.7)
+              .attr('stroke', 'none');
+          });
 
       // Add legend
       const legendSpacing = 20;
@@ -140,7 +186,9 @@ export const Scatterplot: React.FC<ScatterplotProps> = ({
         const transformedData: DataPoint[] = csvData.map((d: any) => ({
           x: +d.GrLivArea || 0,
           y: +d.SalePrice || 0,
-          category: 'default'
+          category: 'default',
+          GrLivArea: +d.GrLivArea || 0,
+          SalePrice: +d.SalePrice || 0
         }));
         createPlot(transformedData);
       }).catch(error => {
