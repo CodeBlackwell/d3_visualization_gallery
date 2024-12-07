@@ -1,0 +1,46 @@
+.dataset-exploration {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dataset-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.dataset-header h1 {
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+}
+
+.dataset-description {
+  color: var(--color-text-secondary);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.visualizations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.visualization-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  background: var(--color-background-secondary);
+  border-radius: 8px;
+  color: var(--color-text-secondary);
+}
+
+.dataset-not-found {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--color-text-secondary);
+}
