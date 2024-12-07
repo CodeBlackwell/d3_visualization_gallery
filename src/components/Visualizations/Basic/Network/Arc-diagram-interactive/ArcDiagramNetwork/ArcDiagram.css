@@ -5,6 +5,7 @@
   justify-content: center;
   align-items: center;
   min-height: 600px;
+  background: var(--arc-diagram-bg);
 }
 
 .arc-diagram-container {
@@ -35,34 +36,34 @@
 }
 
 .arc-diagram .node circle {
-  fill: #4A5568;
+  fill: var(--arc-diagram-node-color);
   transition: fill 0.2s ease;
 }
 
 .arc-diagram .node:hover circle {
-  fill: #C1A15A;
+  fill: var(--arc-diagram-node-hover-color);
 }
 
 .arc-diagram .node text {
   font-size: 12px;
-  fill: #9CA3AF;
+  fill: var(--arc-diagram-text-color);
   transition: fill 0.2s ease;
 }
 
 .arc-diagram .node:hover text {
-  fill: #ffffff;
+  fill: var(--arc-diagram-text-hover-color);
 }
 
 .arc-diagram .link {
   fill: none;
-  stroke: #4A5568;
-  stroke-opacity: 0.4;
+  stroke: var(--arc-diagram-link-color);
+  stroke-opacity: var(--arc-diagram-link-opacity);
   transition: stroke 0.2s ease, stroke-opacity 0.2s ease;
 }
 
 .arc-diagram .link:hover {
-  stroke: #C1A15A;
-  stroke-opacity: 0.8;
+  stroke: var(--arc-diagram-link-hover-color);
+  stroke-opacity: var(--arc-diagram-link-hover-opacity);
 }
 
 .arc-diagram-tooltip {

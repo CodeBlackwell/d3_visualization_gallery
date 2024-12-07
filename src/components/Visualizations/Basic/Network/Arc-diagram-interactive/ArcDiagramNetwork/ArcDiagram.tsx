@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import useArcDiagram from '../hooks/useArcDiagram';
 import { ARC_CONFIG, VISUALIZATIONS } from '../../../../../../../src/constants/visualizationConfig';
+import { arcDiagramTheme } from '../theme/colors';
 import './ArcDiagram.css';
 
 interface ArcDiagramProps {
@@ -27,6 +28,20 @@ const ArcDiagram: React.FC<ArcDiagramProps> = ({ className }) => {
       console.error('Arc diagram configuration not found');
       return;
     }
+
+    const root = document.documentElement;
+    root.style.setProperty('--arc-diagram-bg', arcDiagramTheme.background.primary);
+    root.style.setProperty('--arc-diagram-bg-surface', arcDiagramTheme.background.surface);
+    root.style.setProperty('--arc-diagram-bg-overlay', arcDiagramTheme.background.overlay);
+    root.style.setProperty('--arc-diagram-node-color', arcDiagramTheme.node.default);
+    root.style.setProperty('--arc-diagram-node-hover-color', arcDiagramTheme.node.hover);
+    root.style.setProperty('--arc-diagram-text-color', arcDiagramTheme.text.default);
+    root.style.setProperty('--arc-diagram-text-hover-color', arcDiagramTheme.text.hover);
+    root.style.setProperty('--arc-diagram-link-color', arcDiagramTheme.link.default);
+    root.style.setProperty('--arc-diagram-link-hover-color', arcDiagramTheme.link.hover);
+    root.style.setProperty('--arc-diagram-link-opacity', arcDiagramTheme.link.opacity.default.toString());
+    root.style.setProperty('--arc-diagram-link-hover-opacity', arcDiagramTheme.link.opacity.hover.toString());
+    root.style.setProperty('--arc-diagram-border-color', arcDiagramTheme.border.default);
 
     const initVisualization = async () => {
       try {
