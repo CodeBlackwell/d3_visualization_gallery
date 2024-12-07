@@ -1,27 +1,30 @@
 # 🎨 D3.js Visualization Gallery
 
-[![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![D3.js](https://img.shields.io/badge/D3.js-F9A03C?style=for-the-badge&logo=d3.js&logoColor=white)](https://d3js.org/)
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
-> 🚀 A modern gallery of D3.js visualizations, transformed from Observable notebooks into reusable, AI-friendly code generation prompts.
+> 🚀 A modern, TypeScript-powered gallery of D3.js visualizations with React components and interactive features.
 
 ## 🎯 Project Objective
 
-This project aims to convert a collection of D3.js visualizations from Observable notebooks into structured, reusable code that can be easily:
-1. Generated through AI prompts
-2. Integrated into modern web applications
-3. Customized and extended for different use cases
+This project showcases D3.js visualizations in a modern React application, featuring:
+1. TypeScript integration for improved type safety and developer experience
+2. Modular component architecture for easy extension
+3. Interactive visualization gallery with configurable options
+4. Responsive design and smooth animations
 
 ## 🌟 Features
 
 - 📊 Interactive D3.js visualizations
-- 🔄 Modern module-based architecture
-- 🎨 Clean, consistent styling
+- 💪 Full TypeScript support
+- 🔄 React component architecture
+- 🎨 Consistent styling with CSS modules
 - 🛠️ Easy-to-use visualization selector
 - 📱 Responsive design
-- 🤖 AI-friendly code structure
+- 🐛 Comprehensive error handling
 
 ## 🎬 Current Visualizations
 
@@ -29,6 +32,12 @@ This project aims to convert a collection of D3.js visualizations from Observabl
 - Topographic visualization of Maungawhau volcano
 - Interactive contour lines with color gradients
 - Elevation data representation
+
+### 🔄 Arc Diagram
+- Network visualization showing researcher connections
+- Interactive node highlighting
+- Smooth transitions and animations
+- Configurable styling options
 
 *More visualizations coming soon!*
 
@@ -39,7 +48,7 @@ This project aims to convert a collection of D3.js visualizations from Observabl
 - npm or yarn
 
 ### Installation
-\`\`\`bash
+```bash
 # Clone the repository
 git clone https://github.com/CodeBlackwell/t5d3_dataset.git
 
@@ -51,56 +60,90 @@ npm install
 
 # Start development server
 npm run dev
-\`\`\`
+```
 
 ## 🏗️ Project Structure
 
-\`\`\`
-t5d3_dataset/
-├── public/
-│   ├── data/          # Visualization data files
-│   └── index.html     # Main HTML file
-├── visualizations/    # Visualization modules
-│   └── contour/       # Contour-based visualizations
-├── notebooks/        # Original Observable notebooks
-└── src/
-    └── js/           # JavaScript source files
-\`\`\`
+```
+src/
+├── components/                # React components
+│   ├── ArcDiagram/           # Arc diagram visualization
+│   │   ├── ArcDiagram.tsx    # Main component
+│   │   └── ArcDiagram.css    # Styles
+│   └── VisualizationGallery/ # Gallery component
+├── constants/                 # Configuration constants
+│   └── visualizationConfig.ts # Visualization settings
+├── hooks/                    # Custom React hooks
+│   └── useArcDiagram.ts     # Arc diagram logic
+├── types/                    # TypeScript type definitions
+│   └── visualization.ts      # Shared types
+└── App.tsx                   # Main application
+```
 
-## 🛠️ Development
+## 🛠️ Component Architecture
 
-Each visualization is structured as a module with:
-1. Metadata (name, description)
-2. Required HTML structure
-3. CSS styling
-4. Visualization logic
+### Visualization Gallery
+- Main container for all visualizations
+- Handles visualization selection and rendering
+- Manages state and configuration
 
-### Adding a New Visualization
-1. Create a new module in the appropriate category folder
-2. Define metadata and visualization components
-3. Import and register in main.js
-4. Document the AI prompt structure
+### Arc Diagram
+- Network visualization component
+- Uses D3.js for rendering
+- Configurable through props:
+  - Data URL
+  - Dimensions
+  - Styling options
+  - Interaction behaviors
 
-## 🤖 AI Prompt Structure
+### Custom Hooks
+- `useArcDiagram`: Manages D3.js visualization lifecycle
+- Handles:
+  - Data fetching
+  - SVG creation
+  - Animations
+  - Event handling
+  - Cleanup
 
-Each visualization includes:
-1. Data requirements
-2. Visual components
-3. Interaction patterns
-4. Customization options
+## 🎨 Styling
+
+- CSS modules for component-specific styling
+- Consistent theme across visualizations
+- Responsive design patterns
+- Smooth transitions and animations
+
+## 🔧 Configuration
+
+Visualizations are configured through `visualizationConfig.ts`:
+```typescript
+export const VISUALIZATIONS: Visualization[] = [
+  {
+    id: 'arc',
+    name: 'Arc Diagram',
+    description: 'Network visualization...',
+    dataUrl: '...'
+  }
+];
+
+export const ARC_CONFIG: ArcConfig = {
+  dimensions: { ... },
+  styles: { ... }
+};
+```
 
 ## 📚 Documentation
 
 - [D3.js Documentation](https://d3js.org/)
-- [Observable Notebooks](https://observablehq.com/)
+- [React Documentation](https://reactjs.org/)
+- [TypeScript Documentation](https://www.typescriptlang.org/)
 - [Vite Guide](https://vitejs.dev/guide/)
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create your feature branch (\`git checkout -b feature/AmazingFeature\`)
-3. Commit your changes (\`git commit -m 'Add some AmazingFeature'\`)
-4. Push to the branch (\`git push origin feature/AmazingFeature\`)
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
 ## 📝 License
@@ -109,8 +152,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- [D3.js](https://d3js.org/) - Mike Bostock
-- [Observable](https://observablehq.com/) - Observable, Inc.
+- [D3.js](https://d3js.org/) for the amazing visualization library
+- [React](https://reactjs.org/) for the UI framework
+- [TypeScript](https://www.typescriptlang.org/) for type safety
 - Original notebook authors and contributors
 
 ---
