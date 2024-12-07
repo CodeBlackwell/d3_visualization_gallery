@@ -65,9 +65,12 @@ const WorldHealthMap: React.FC<WorldHealthMapProps> = ({ className, data = [], m
         const topology = await response.json();
         const world = topojson.feature(topology, topology.objects.countries) as unknown as GeoJSON.FeatureCollection<GeoJSON.MultiPolygon>;
 
-        // Create color scale
+        // Create color scale with a better color scheme
         const colorScale = d3.scaleSequential(d3.interpolateYlOrRd)
-          .domain([0, d3.max(data, d => d.value) || 100]);
+          .domain([
+            d3.min(data, d => d.value) || 0,
+            d3.max(data, d => d.value) || 100
+          ]);
 
         // Create projection
         const projection = d3.geoMercator()
@@ -76,6 +79,22 @@ const WorldHealthMap: React.FC<WorldHealthMapProps> = ({ className, data = [], m
         // Create path generator
         const path = d3.geoPath()
           .projection(projection);
+
+        // Create tooltip
+        const tooltip = d3.select(container)
+          .append('div')
+          .attr('class', 'tooltip')
+          .style('opacity', 0)
+          .style('position', 'fixed')
+          .style('background-color', 'rgba(0, 0, 0, 0.8)')
+          .style('color', 'white')
+          .style('padding', '8px')
+          .style('border-radius', '4px')
+          .style('font-size', '12px')
+          .style('pointer-events', 'none')
+          .style('z-index', '1000')
+          .style('max-width', '200px')
+          .style('box-shadow', '0 2px 4px rgba(0,0,0,0.2)');
 
         // Draw map
         svg.selectAll('path')
@@ -90,110 +109,106 @@ const WorldHealthMap: React.FC<WorldHealthMapProps> = ({ className, data = [], m
           })
           .style('stroke', config.styles.country.stroke)
           .style('stroke-width', config.styles.country.strokeWidth)
-          .on('mouseover', function(event, d: any) {
+          .on('mousemove', function(event, d: any) {
             const countryData = data.find(item => item.code === d.id);
             
             // Highlight country
             d3.select(this)
               .transition()
               .duration(200)
-              .style('stroke-width', 2);
+              .style('stroke-width', 2)
+              .style('stroke', '#000');
 
-            // Show tooltip
-            const tooltip = d3.select(container)
-              .append('div')
-              .attr('class', 'tooltip')
-              .style('opacity', 0);
-
-            tooltip.transition()
-              .duration(200)
-              .style('opacity', .9);
-
-            tooltip.html(`
-              <strong>${d.properties.name}</strong><br/>
-              ${metric}: ${countryData ? countryData.value.toFixed(1) : 'No data'}
-            `)
-              .style('left', (event.pageX) + 'px')
-              .style('top', (event.pageY - 28) + 'px');
+            if (countryData) {
+              tooltip.transition()
+                .duration(50)
+                .style('opacity', 0.9);
+              
+              tooltip.html(`
+                <strong>${countryData.country}</strong><br/>
+                ${metric}: ${countryData.value.toFixed(1)}
+              `)
+                .style('left', `${event.clientX + 12}px`)
+                .style('top', `${event.clientY - 28}px`);
+            }
           })
-          .on('mouseout', function(event, d) {
-            // Remove highlight
+          .on('mouseout', function() {
+            // Reset highlight
             d3.select(this)
               .transition()
               .duration(200)
-              .style('stroke-width', config.styles.country.strokeWidth);
+              .style('stroke-width', config.styles.country.strokeWidth)
+              .style('stroke', config.styles.country.stroke);
 
-            // Remove tooltip
-            d3.select(container)
-              .selectAll('.tooltip')
-              .remove();
+            // Hide tooltip
+            tooltip.transition()
+              .duration(200)
+              .style('opacity', 0);
           });
 
         // Add legend
         const legendWidth = 200;
         const legendHeight = 10;
-
+        
         const legendScale = d3.scaleLinear()
           .domain(colorScale.domain())
           .range([0, legendWidth]);
 
         const legendAxis = d3.axisBottom(legendScale)
           .ticks(5)
-          .tickFormat(d => d.toString());
+          .tickFormat(d => d.toFixed(1));
 
         const legend = svg.append('g')
           .attr('class', 'legend')
-          .attr('transform', `translate(${(width - legendWidth) / 2},${height + 20})`);
+          .attr('transform', `translate(${width - legendWidth - 20},${height - 40})`);
 
         const defs = svg.append('defs');
         const linearGradient = defs.append('linearGradient')
-          .attr('id', 'legend-gradient')
-          .attr('x1', '0%')
-          .attr('y1', '0%')
-          .attr('x2', '100%')
-          .attr('y2', '0%');
+          .attr('id', 'linear-gradient');
 
         linearGradient.selectAll('stop')
           .data(d3.range(0, 1.1, 0.1))
           .enter()
           .append('stop')
-          .attr('offset', d => `${d * 100}%`)
+          .attr('offset', d => d * 100 + '%')
           .attr('stop-color', d => colorScale(d * (colorScale.domain()[1] - colorScale.domain()[0]) + colorScale.domain()[0]));
 
         legend.append('rect')
           .attr('width', legendWidth)
           .attr('height', legendHeight)
-          .style('fill', 'url(#legend-gradient)');
+          .style('fill', 'url(#linear-gradient)');
 
         legend.append('g')
           .attr('transform', `translate(0,${legendHeight})`)
-          .call(legendAxis);
+          .call(legendAxis)
+          .selectAll('text')
+          .style('font-size', '10px');
 
         legend.append('text')
           .attr('x', legendWidth / 2)
-          .attr('y', legendHeight + 30)
+          .attr('y', -5)
           .attr('text-anchor', 'middle')
+          .style('font-size', '12px')
           .text(metric);
 
       } catch (error) {
-        console.error('Error loading or rendering map data:', error);
-        throw error;
+        console.error('Error creating visualization:', error);
+        // Add error message to the container
+        d3.select(container)
+          .append('div')
+          .attr('class', 'error-message')
+          .text('Error loading map data. Please try again later.');
       }
     };
 
     createVisualization();
-
-    return () => {
-      if (containerRef.current) {
-        containerRef.current.innerHTML = '';
-      }
-    };
   }, [data, metric]);
 
   return (
     <div 
-      ref={containerRef} 
-      className={`world-health-map-container ${className || ''}`}
+      ref={containerRef}
+      className={`world-health-map ${className || ''}`}
+      style={{ width: '100%', height: '100%', position: 'relative' }}
     />
   );
 };
