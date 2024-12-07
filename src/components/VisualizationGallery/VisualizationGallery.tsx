@@ -4,7 +4,7 @@ import ArcDiagram from '../Visualizations/Basic/Network/Arc-diagram-interactive/
 import WorldMap from '../Visualizations/Basic/WorldMap/Projection2D/WorldMap';
 import DatasetExploration from '../shared/DatasetExploration/DatasetExploration';
 import { VISUALIZATIONS } from '../../constants/visualizationConfig';
-import './VisualizationGallery.css';
+import './../DatasetExploration/DatasetExploration.css'; // Reusable component styles
 
 const galleryConfig = {
   title: "D3 Visualization Gallery",

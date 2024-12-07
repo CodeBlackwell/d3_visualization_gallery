@@ -84,19 +84,27 @@ const useArcDiagram = () => {
       // Clear previous content
       container.selectAll('*').remove();
 
-      const { margin, width, height } = config.dimensions || {
-        margin: { top: 0, right: 30, bottom: 50, left: 60 },
-        width: 650,
-        height: 400
+      // Get container dimensions
+      const containerWidth = containerRef.clientWidth;
+      const containerHeight = containerRef.clientHeight;
+
+      const { margin } = config.dimensions || {
+        margin: { top: 0, right: 30, bottom: 50, left: 60 }
       };
+
+      // Use container dimensions instead of fixed values
+      const width = containerWidth - margin.left - margin.right;
+      const height = containerHeight - margin.top - margin.bottom;
 
       console.log('Using dimensions:', { margin, width, height });
 
-      // Create the SVG container
+      // Create the SVG container with viewBox for responsiveness
       const svg = container
         .append('svg')
-        .attr('width', width + margin.left + margin.right)
-        .attr('height', height + margin.top + margin.bottom)
+        .attr('width', '100%')
+        .attr('height', '100%')
+        .attr('viewBox', `0 0 ${containerWidth} ${containerHeight}`)
+        .attr('preserveAspectRatio', 'xMidYMid meet')
         .append('g')
         .attr('transform', `translate(${margin.left}, ${margin.top})`);
 

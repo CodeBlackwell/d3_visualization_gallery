@@ -8,7 +8,7 @@
 }
 
 .dataset-header {
-  padding: 2rem 2rem 1rem;
+  padding: 3rem 2rem 2rem;
   text-align: center;
   width: 100%;
   max-width: 1200px;
@@ -17,17 +17,18 @@
 
 .dataset-header h1 {
   color: var(--color-text-primary);
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   font-size: 2.5rem;
   font-family: var(--font-heading);
 }
 
 .dataset-description {
   color: var(--color-text-secondary);
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   line-height: 1.6;
   max-width: 800px;
   margin: 0 auto;
+  padding: 0 1rem 2rem;
 }
 
 .dataset-content {

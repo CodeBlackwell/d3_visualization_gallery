@@ -3,7 +3,7 @@
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   width: 100%;
-  height: calc(100vh - 320px);
+  height: calc(100vh - 280px);
   min-height: 600px;
   display: flex;
   flex-direction: column;
@@ -12,9 +12,10 @@
 }
 
 .dataset-visualization-header {
-  padding: 2rem;
+  padding: 1.5rem 2rem;
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
 }
 
 .dataset-visualization-header h2 {
@@ -35,12 +36,13 @@
 
 .dataset-visualization-content {
   flex: 1;
+  position: relative;
+  overflow: hidden;
   padding: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--color-background);
-  overflow: auto;
 }
 
 .visualization-placeholder {
