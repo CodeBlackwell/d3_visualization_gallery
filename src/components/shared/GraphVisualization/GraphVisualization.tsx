@@ -23,13 +23,17 @@ interface GraphVisualizationProps {
   edges: Edge[];
   width?: number;
   height?: number;
+  highlightedNode?: string | null;
+  visitedNodes?: Set<string>;
 }
 
 const GraphVisualization: React.FC<GraphVisualizationProps> = ({
   nodes,
   edges,
   width = 600,
-  height = 400
+  height = 400,
+  highlightedNode = null,
+  visitedNodes = new Set()
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -91,7 +95,12 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
 
     nodeGroups.append('circle')
       .attr('r', 10)
-      .attr('class', 'node-circle');
+      .attr('class', 'node-circle')
+      .style('fill', d => {
+        if (d.id === highlightedNode) return '#ff6b6b';  // Highlighted node
+        if (visitedNodes.has(d.id)) return '#a8e6cf';    // Visited node
+        return '#4a4a4a';                                // Default color
+      });
 
     nodeGroups.append('text')
       .text(d => d.label)
@@ -112,7 +121,7 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
     return () => {
       simulation.stop();
     };
-  }, [nodes, edges, width, height]);
+  }, [nodes, edges, width, height, highlightedNode, visitedNodes]);
 
   return (
     <div className="graph-visualization">

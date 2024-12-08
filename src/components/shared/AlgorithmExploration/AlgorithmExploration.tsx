@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './AlgorithmExploration.css';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import GraphVisualization from '../GraphVisualization/GraphVisualization';
+import { useNodeHighlighting } from '../../../hooks/useNodeHighlighting';
 
 interface Algorithm {
   id: string;
@@ -14,25 +15,109 @@ interface Algorithm {
 
 const AlgorithmExploration: React.FC = () => {
   const { structure, type } = useParams<{ structure: string; type: string }>();
+  const location = useLocation();
+
+  // Debug component lifecycle
+  useEffect(() => {
+    console.log('AlgorithmExploration mounted');
+    return () => console.log('AlgorithmExploration unmounted');
+  }, []);
+
+  const {
+    currentHighlight,
+    visitedNodes,
+    isAnimating,
+    highlightNodes,
+    stopHighlighting
+  } = useNodeHighlighting({
+    delay: 500,
+    onAnimationComplete: () => {
+      console.log('Animation sequence completed');
+    }
+  });
+
+  // Stop animation on navigation
+  useEffect(() => {
+    console.log('Location changed, stopping animation');
+    stopHighlighting();
+  }, [location, stopHighlighting]);
+
+  // Helper functions for graph traversal
+  const bfs = (startId: string, nodes: any[], edges: any[]): string[] => {
+    const visited = new Set<string>();
+    const sequence: string[] = [];
+    const queue: string[] = [startId];
+    
+    // Create adjacency list
+    const adjacencyList = new Map<string, string[]>();
+    edges.forEach(edge => {
+      if (!adjacencyList.has(edge.source)) adjacencyList.set(edge.source, []);
+      if (!adjacencyList.has(edge.target)) adjacencyList.set(edge.target, []);
+      adjacencyList.get(edge.source)!.push(edge.target);
+      adjacencyList.get(edge.target)!.push(edge.source);
+    });
+
+    while (queue.length > 0) {
+      const currentId = queue.shift()!;
+      if (!visited.has(currentId)) {
+        visited.add(currentId);
+        sequence.push(currentId);
+        
+        const neighbors = adjacencyList.get(currentId) || [];
+        for (const neighbor of neighbors) {
+          if (!visited.has(neighbor)) {
+            queue.push(neighbor);
+          }
+        }
+      }
+    }
+
+    return sequence;
+  };
+
+  const dfs = (startId: string, nodes: any[], edges: any[]): string[] => {
+    const visited = new Set<string>();
+    const sequence: string[] = [];
+    
+    const adjacencyList = new Map<string, string[]>();
+    edges.forEach(edge => {
+      if (!adjacencyList.has(edge.source)) adjacencyList.set(edge.source, []);
+      if (!adjacencyList.has(edge.target)) adjacencyList.set(edge.target, []);
+      adjacencyList.get(edge.source)!.push(edge.target);
+      adjacencyList.get(edge.target)!.push(edge.source);
+    });
+
+    const dfsRecursive = (nodeId: string) => {
+      visited.add(nodeId);
+      sequence.push(nodeId);
+      
+      const neighbors = adjacencyList.get(nodeId) || [];
+      for (const neighbor of neighbors) {
+        if (!visited.has(neighbor)) {
+          dfsRecursive(neighbor);
+        }
+      }
+    };
+
+    dfsRecursive(startId);
+    return sequence;
+  };
 
   const renderVisualization = () => {
     if (structure === 'graph') {
-      // Generate 20 nodes with labels A through T
+      console.log('Rendering graph visualization');
+      
       const nodes = Array.from({ length: 20 }, (_, i) => ({
         id: String(i + 1),
-        label: String.fromCharCode(65 + i) // A=65 in ASCII
+        label: String.fromCharCode(65 + i)
       }));
 
-      // Create edges to form an interesting connected structure
       const edges = [
-        // Circular connection
         ...Array.from({ length: 19 }, (_, i) => ({
           source: String(i + 1),
           target: String(i + 2)
         })),
-        { source: '20', target: '1' }, // Complete the circle
-
-        // Cross connections for more interesting visualization
+        { source: '20', target: '1' },
         { source: '1', target: '5' },
         { source: '2', target: '7' },
         { source: '3', target: '9' },
@@ -45,12 +130,52 @@ const AlgorithmExploration: React.FC = () => {
         { source: '14', target: '20' }
       ];
 
-      return <GraphVisualization 
-        nodes={nodes} 
-        edges={edges}
-        width={800}  // Increased width
-        height={600} // Increased height
-      />;
+      const handleBFSHighlight = () => {
+        console.log('Starting BFS traversal');
+        const sequence = bfs('1', nodes, edges);
+        highlightNodes(sequence);
+      };
+
+      const handleDFSHighlight = () => {
+        console.log('Starting DFS traversal');
+        const sequence = dfs('1', nodes, edges);
+        highlightNodes(sequence);
+      };
+
+      return (
+        <div className="graph-container">
+          <GraphVisualization 
+            nodes={nodes} 
+            edges={edges}
+            width={800}
+            height={600}
+            highlightedNode={currentHighlight}
+            visitedNodes={visitedNodes}
+          />
+          <div className="controls">
+            <button 
+              onClick={handleBFSHighlight}
+              disabled={isAnimating}
+            >
+              {isAnimating ? 'Highlighting...' : 'BFS Highlight'}
+            </button>
+            <button 
+              onClick={handleDFSHighlight}
+              disabled={isAnimating}
+            >
+              {isAnimating ? 'Highlighting...' : 'DFS Highlight'}
+            </button>
+            {isAnimating && (
+              <button 
+                onClick={stopHighlighting}
+                className="stop-button"
+              >
+                Stop
+              </button>
+            )}
+          </div>
+        </div>
+      );
     }
     return (
       <div className="coming-soon">
