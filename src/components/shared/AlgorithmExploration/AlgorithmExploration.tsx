@@ -173,6 +173,7 @@ const AlgorithmExploration: React.FC = () => {
   }), []);
 
   const handleAlgorithmChange = (algorithmId: string) => {
+    setType(algorithmId);
     navigate(`/datastructures/${structure}/${algorithmId}`);
     stopHighlighting();
   };
