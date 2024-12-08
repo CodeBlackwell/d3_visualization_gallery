@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import './AlgorithmExploration.css';
 import { useParams, useLocation } from 'react-router-dom';
 import GraphVisualization from '../GraphVisualization/GraphVisualization';
@@ -103,32 +103,34 @@ const AlgorithmExploration: React.FC = () => {
     return sequence;
   };
 
+  // Memoize nodes and edges
+  const { nodes, edges } = useMemo(() => ({
+    nodes: Array.from({ length: 20 }, (_, i) => ({
+      id: String(i + 1),
+      label: String.fromCharCode(65 + i)
+    })),
+    edges: [
+      ...Array.from({ length: 19 }, (_, i) => ({
+        source: String(i + 1),
+        target: String(i + 2)
+      })),
+      { source: '20', target: '1' },
+      { source: '1', target: '5' },
+      { source: '2', target: '7' },
+      { source: '3', target: '9' },
+      { source: '4', target: '11' },
+      { source: '6', target: '15' },
+      { source: '8', target: '16' },
+      { source: '10', target: '18' },
+      { source: '12', target: '19' },
+      { source: '13', target: '17' },
+      { source: '14', target: '20' }
+    ]
+  }), []);
+
   const renderVisualization = () => {
     if (structure === 'graph') {
       console.log('Rendering graph visualization');
-      
-      const nodes = Array.from({ length: 20 }, (_, i) => ({
-        id: String(i + 1),
-        label: String.fromCharCode(65 + i)
-      }));
-
-      const edges = [
-        ...Array.from({ length: 19 }, (_, i) => ({
-          source: String(i + 1),
-          target: String(i + 2)
-        })),
-        { source: '20', target: '1' },
-        { source: '1', target: '5' },
-        { source: '2', target: '7' },
-        { source: '3', target: '9' },
-        { source: '4', target: '11' },
-        { source: '6', target: '15' },
-        { source: '8', target: '16' },
-        { source: '10', target: '18' },
-        { source: '12', target: '19' },
-        { source: '13', target: '17' },
-        { source: '14', target: '20' }
-      ];
 
       const handleBFSHighlight = () => {
         console.log('Starting BFS traversal');

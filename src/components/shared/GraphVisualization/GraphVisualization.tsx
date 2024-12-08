@@ -1,16 +1,12 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import * as d3 from 'd3';
 import './GraphVisualization.css';
 
-interface Node {
+interface Node extends d3.SimulationNodeDatum {
   id: string;
   label: string;
   x?: number;
   y?: number;
-  vx?: number;
-  vy?: number;
-  fx?: number | null;
-  fy?: number | null;
 }
 
 interface Edge {
@@ -36,14 +32,10 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
   visitedNodes = new Set()
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
-
-  useEffect(() => {
-    if (!svgRef.current) return;
-
-    // Clear previous contents
-    d3.select(svgRef.current).selectAll('*').remove();
-
-    // Construct SimulationLinkDatum array
+  const simulationRef = useRef<d3.Simulation<Node, d3.SimulationLinkDatum<Node>> | null>(null);
+  
+  // Memoize the graph structure setup
+  const graphData = useMemo(() => {
     const edgesWithNodes: d3.SimulationLinkDatum<Node>[] = edges.map(edge => {
       const sourceNode = nodes.find(node => node.id === edge.source);
       const targetNode = nodes.find(node => node.id === edge.target);
@@ -52,42 +44,48 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
         throw new Error(`Invalid edge: ${edge.source} -> ${edge.target}`);
       }
 
-      // Cast is safe since we know nodes are defined
       return { source: sourceNode, target: targetNode };
     });
 
-    // Create the simulation with generics
-    const simulation = d3.forceSimulation<Node>(nodes)
-      .force('link', d3.forceLink<Node, d3.SimulationLinkDatum<Node>>(edgesWithNodes).id(d => d.id))
+    return { nodes, edgesWithNodes };
+  }, [nodes, edges]);
+
+  // Setup the graph structure once
+  useEffect(() => {
+    if (!svgRef.current) return;
+
+    // Clear previous contents
+    d3.select(svgRef.current).selectAll('*').remove();
+
+    const simulation = d3.forceSimulation<Node>(graphData.nodes)
+      .force('link', d3.forceLink<Node, d3.SimulationLinkDatum<Node>>(graphData.edgesWithNodes).id(d => d.id))
       .force('charge', d3.forceManyBody().strength(-100))
       .force('center', d3.forceCenter(width / 2, height / 2));
 
-    const svg = d3.select(svgRef.current as SVGSVGElement);
+    const svg = d3.select(svgRef.current);
 
-    // Typing the selections
     const links = svg.append('g')
       .selectAll<SVGLineElement, d3.SimulationLinkDatum<Node>>('line')
-      .data(edgesWithNodes)
+      .data(graphData.edgesWithNodes)
       .join('line')
       .attr('class', 'graph-edge');
 
     const nodeGroups = svg.append('g')
       .selectAll<SVGGElement, Node>('g')
-      .data(nodes)
+      .data(graphData.nodes)
       .join('g')
       .attr('class', 'graph-node')
-      // Ensure drag event typings align with Node
       .call(d3.drag<SVGGElement, Node>()
-        .on('start', (event: d3.D3DragEvent<SVGGElement, Node, Node>, d) => {
+        .on('start', (event, d) => {
           if (!event.active) simulation.alphaTarget(0.3).restart();
           d.fx = d.x;
           d.fy = d.y;
         })
-        .on('drag', (event: d3.D3DragEvent<SVGGElement, Node, Node>, d) => {
+        .on('drag', (event, d) => {
           d.fx = event.x;
           d.fy = event.y;
         })
-        .on('end', (event: d3.D3DragEvent<SVGGElement, Node, Node>, d) => {
+        .on('end', (event, d) => {
           if (!event.active) simulation.alphaTarget(0);
           d.fx = null;
           d.fy = null;
@@ -95,12 +93,7 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
 
     nodeGroups.append('circle')
       .attr('r', 10)
-      .attr('class', 'node-circle')
-      .style('fill', d => {
-        if (d.id === highlightedNode) return '#ff6b6b';  // Highlighted node
-        if (visitedNodes.has(d.id)) return '#a8e6cf';    // Visited node
-        return '#4a4a4a';                                // Default color
-      });
+      .attr('class', 'node-circle');
 
     nodeGroups.append('text')
       .text(d => d.label)
@@ -118,10 +111,26 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
       nodeGroups.attr('transform', d => `translate(${d.x ?? 0},${d.y ?? 0})`);
     });
 
+    simulationRef.current = simulation;
+
     return () => {
       simulation.stop();
+      simulationRef.current = null;
     };
-  }, [nodes, edges, width, height, highlightedNode, visitedNodes]);
+  }, [graphData, width, height]);
+
+  // Update only node colors when highlighting changes
+  useEffect(() => {
+    if (!svgRef.current) return;
+
+    d3.select(svgRef.current)
+      .selectAll('.node-circle')
+      .style('fill', (d: any) => {
+        if (d.id === highlightedNode) return '#ff6b6b';
+        if (visitedNodes.has(d.id)) return '#a8e6cf';
+        return '#4a4a4a';
+      });
+  }, [highlightedNode, visitedNodes]);
 
   return (
     <div className="graph-visualization">
@@ -130,4 +139,4 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
   );
 };
 
-export default GraphVisualization;
+export default React.memo(GraphVisualization);
