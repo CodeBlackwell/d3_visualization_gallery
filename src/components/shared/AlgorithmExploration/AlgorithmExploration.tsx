@@ -17,18 +17,40 @@ const AlgorithmExploration: React.FC = () => {
 
   const renderVisualization = () => {
     if (structure === 'graph') {
-      // Example graph data - you may want to modify this based on your needs
-      const nodes = [
-        { id: '1', label: 'A' },
-        { id: '2', label: 'B' },
-        { id: '3', label: 'C' }
-      ];
+      // Generate 20 nodes with labels A through T
+      const nodes = Array.from({ length: 20 }, (_, i) => ({
+        id: String(i + 1),
+        label: String.fromCharCode(65 + i) // A=65 in ASCII
+      }));
+
+      // Create edges to form an interesting connected structure
       const edges = [
-        { source: '1', target: '2' },
-        { source: '2', target: '3' },
-        { source: '3', target: '1' }
+        // Circular connection
+        ...Array.from({ length: 19 }, (_, i) => ({
+          source: String(i + 1),
+          target: String(i + 2)
+        })),
+        { source: '20', target: '1' }, // Complete the circle
+
+        // Cross connections for more interesting visualization
+        { source: '1', target: '5' },
+        { source: '2', target: '7' },
+        { source: '3', target: '9' },
+        { source: '4', target: '11' },
+        { source: '6', target: '15' },
+        { source: '8', target: '16' },
+        { source: '10', target: '18' },
+        { source: '12', target: '19' },
+        { source: '13', target: '17' },
+        { source: '14', target: '20' }
       ];
-      return <GraphVisualization nodes={nodes} edges={edges} />;
+
+      return <GraphVisualization 
+        nodes={nodes} 
+        edges={edges}
+        width={800}  // Increased width
+        height={600} // Increased height
+      />;
     }
     return (
       <div className="coming-soon">
