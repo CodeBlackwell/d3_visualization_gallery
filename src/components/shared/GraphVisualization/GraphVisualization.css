@@ -1,0 +1,41 @@
+.graph-visualization {
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.graph-visualization svg {
+  display: block;
+  margin: auto;
+}
+
+.graph-edge {
+  stroke: #999;
+  stroke-width: 2px;
+  stroke-opacity: 0.6;
+}
+
+.graph-node {
+  cursor: pointer;
+}
+
+.node-circle {
+  fill: #69b3a2;
+  stroke: #fff;
+  stroke-width: 2px;
+}
+
+.node-label {
+  font-size: 12px;
+  fill: #333;
+  pointer-events: none;
+}
+
+.node-circle:hover {
+  fill: #4a7a6c;
+}

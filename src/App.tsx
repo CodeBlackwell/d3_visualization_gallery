@@ -18,7 +18,7 @@ const App: React.FC = () => {
             <Route path="/" element={<VisualizationGallery />} />
             <Route path="/visualization/:id" element={<VisualizationGallery />} />
             <Route path="/datasetexploration/globalhealth" element={<GlobalHealthExploration />} />
-            <Route path="/algorithms/:dataStructure/:algorithm" element={<AlgorithmExploration />} />
+            <Route path="/datastructures/:structure/:type" element={<AlgorithmExploration />} />
             <Route path="/about" element={<About />} />
           </Routes>
         </main>

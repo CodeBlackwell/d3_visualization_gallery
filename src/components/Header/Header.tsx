@@ -21,7 +21,7 @@ const Header: React.FC = () => {
           </div>
           <div className="dropdown-container">
             <button className="datasets-button">
-              Algorithms
+              Data Structures
               <FaChevronDown className="dropdown-icon" />
             </button>
             <div className="dropdown-menu">
@@ -31,10 +31,13 @@ const Header: React.FC = () => {
                   <FaChevronRight className="dropdown-arrow" />
                 </div>
                 <div className="nested-dropdown-menu">
-                  <Link to="/algorithms/graph/dfs" className="dropdown-item">Depth-First Search</Link>
-                  <Link to="/algorithms/graph/bfs" className="dropdown-item">Breadth-First Search</Link>
-                  <Link to="/algorithms/graph/dijkstra" className="dropdown-item">Dijkstra's Algorithm</Link>
-                  <Link to="/algorithms/graph/mst" className="dropdown-item">Minimum Spanning Tree</Link>
+                  <Link to="/datastructures/graph/directed" className="dropdown-item">Directed Graph</Link>
+                  <Link to="/datastructures/graph/undirected" className="dropdown-item">Undirected Graph</Link>
+                  <Link to="/datastructures/graph/weighted" className="dropdown-item">Weighted Graph</Link>
+                  <Link to="/datastructures/graph/multigraph" className="dropdown-item">MultiGraph</Link>
+                  <Link to="/datastructures/graph/disconnected" className="dropdown-item">Disconnected Graph</Link>
+                  <Link to="/datastructures/graph/cyclic" className="dropdown-item">Cyclic Graph</Link>
+                  <Link to="/datastructures/graph/acyclic" className="dropdown-item">Acyclic Graph (DAG)</Link>
                 </div>
               </div>
               <div className="nested-dropdown">
@@ -43,9 +46,10 @@ const Header: React.FC = () => {
                   <FaChevronRight className="dropdown-arrow" />
                 </div>
                 <div className="nested-dropdown-menu">
-                  <Link to="/algorithms/stack/array" className="dropdown-item">Array Implementation</Link>
-                  <Link to="/algorithms/stack/linked" className="dropdown-item">Linked List Implementation</Link>
-                  <Link to="/algorithms/stack/applications" className="dropdown-item">Common Applications</Link>
+                  <Link to="/datastructures/stack/basic" className="dropdown-item">Basic Stack</Link>
+                  <Link to="/datastructures/stack/min" className="dropdown-item">Min Stack</Link>
+                  <Link to="/datastructures/stack/max" className="dropdown-item">Max Stack</Link>
+                  <Link to="/datastructures/stack/double" className="dropdown-item">Double-Ended Stack</Link>
                 </div>
               </div>
               <div className="nested-dropdown">
@@ -54,9 +58,10 @@ const Header: React.FC = () => {
                   <FaChevronRight className="dropdown-arrow" />
                 </div>
                 <div className="nested-dropdown-menu">
-                  <Link to="/algorithms/queue/array" className="dropdown-item">Array Implementation</Link>
-                  <Link to="/algorithms/queue/linked" className="dropdown-item">Linked List Implementation</Link>
-                  <Link to="/algorithms/queue/priority" className="dropdown-item">Priority Queue</Link>
+                  <Link to="/datastructures/queue/basic" className="dropdown-item">Basic Queue</Link>
+                  <Link to="/datastructures/queue/circular" className="dropdown-item">Circular Queue</Link>
+                  <Link to="/datastructures/queue/priority" className="dropdown-item">Priority Queue</Link>
+                  <Link to="/datastructures/queue/deque" className="dropdown-item">Double-Ended Queue</Link>
                 </div>
               </div>
               <div className="nested-dropdown">
@@ -65,9 +70,10 @@ const Header: React.FC = () => {
                   <FaChevronRight className="dropdown-arrow" />
                 </div>
                 <div className="nested-dropdown-menu">
-                  <Link to="/algorithms/hashmap/chaining" className="dropdown-item">Chaining</Link>
-                  <Link to="/algorithms/hashmap/open-addressing" className="dropdown-item">Open Addressing</Link>
-                  <Link to="/algorithms/hashmap/double-hashing" className="dropdown-item">Double Hashing</Link>
+                  <Link to="/datastructures/hashmap/basic" className="dropdown-item">Basic HashMap</Link>
+                  <Link to="/datastructures/hashmap/ordered" className="dropdown-item">Ordered HashMap</Link>
+                  <Link to="/datastructures/hashmap/multi" className="dropdown-item">MultiMap</Link>
+                  <Link to="/datastructures/hashmap/bidirectional" className="dropdown-item">Bidirectional Map</Link>
                 </div>
               </div>
               <div className="nested-dropdown">
@@ -76,10 +82,13 @@ const Header: React.FC = () => {
                   <FaChevronRight className="dropdown-arrow" />
                 </div>
                 <div className="nested-dropdown-menu">
-                  <Link to="/algorithms/tree/binary" className="dropdown-item">Binary Tree</Link>
-                  <Link to="/algorithms/tree/bst" className="dropdown-item">Binary Search Tree</Link>
-                  <Link to="/algorithms/tree/avl" className="dropdown-item">AVL Tree</Link>
-                  <Link to="/algorithms/tree/red-black" className="dropdown-item">Red-Black Tree</Link>
+                  <Link to="/datastructures/tree/binary" className="dropdown-item">Binary Tree</Link>
+                  <Link to="/datastructures/tree/nary" className="dropdown-item">N-ary Tree</Link>
+                  <Link to="/datastructures/tree/balanced" className="dropdown-item">Balanced Tree</Link>
+                  <Link to="/datastructures/tree/unbalanced" className="dropdown-item">Unbalanced Tree</Link>
+                  <Link to="/datastructures/tree/complete" className="dropdown-item">Complete Tree</Link>
+                  <Link to="/datastructures/tree/full" className="dropdown-item">Full Binary Tree</Link>
+                  <Link to="/datastructures/tree/perfect" className="dropdown-item">Perfect Binary Tree</Link>
                 </div>
               </div>
               <div className="nested-dropdown">
@@ -88,9 +97,11 @@ const Header: React.FC = () => {
                   <FaChevronRight className="dropdown-arrow" />
                 </div>
                 <div className="nested-dropdown-menu">
-                  <Link to="/algorithms/heap/binary" className="dropdown-item">Binary Heap</Link>
-                  <Link to="/algorithms/heap/fibonacci" className="dropdown-item">Fibonacci Heap</Link>
-                  <Link to="/algorithms/heap/applications" className="dropdown-item">Common Applications</Link>
+                  <Link to="/datastructures/heap/min" className="dropdown-item">Min Heap</Link>
+                  <Link to="/datastructures/heap/max" className="dropdown-item">Max Heap</Link>
+                  <Link to="/datastructures/heap/binomial" className="dropdown-item">Binomial Heap</Link>
+                  <Link to="/datastructures/heap/fibonacci" className="dropdown-item">Fibonacci Heap</Link>
+                  <Link to="/datastructures/heap/pairing" className="dropdown-item">Pairing Heap</Link>
                 </div>
               </div>
             </div>
