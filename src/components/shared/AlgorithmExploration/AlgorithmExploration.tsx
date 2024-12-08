@@ -1,21 +1,58 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import './AlgorithmExploration.css';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import GraphVisualization from '../GraphVisualization/GraphVisualization';
+import AlgorithmExplanation from '../AlgorithmExplanation/AlgorithmExplanation';
 import { useNodeHighlighting } from '../../../hooks/useNodeHighlighting';
 
-interface Algorithm {
-  id: string;
-  name: string;
-  description: string;
-  complexity: string;
-  pseudocode: string[];
-  visualizationComponent?: React.ComponentType<any>;
-}
+const ALGORITHMS = {
+  bfs: {
+    id: 'bfs',
+    name: 'Breadth-First Search (BFS)',
+    description: 'BFS is a graph traversal algorithm that explores all vertices at the present depth before moving on to vertices at the next depth level. It uses a queue data structure to track which vertex to explore next.',
+    timeComplexity: 'O(V + E) where V is the number of vertices and E is the number of edges',
+    spaceComplexity: 'O(V) where V is the number of vertices',
+    pseudocode: [
+      'procedure BFS(G, startVertex):',
+      '    let Q be a queue',
+      '    Q.enqueue(startVertex)',
+      '    mark startVertex as visited',
+      '',
+      '    while Q is not empty:',
+      '        vertex = Q.dequeue()',
+      '        for each neighbor of vertex:',
+      '            if neighbor is not visited:',
+      '                Q.enqueue(neighbor)',
+      '                mark neighbor as visited'
+    ]
+  },
+  dfs: {
+    id: 'dfs',
+    name: 'Depth-First Search (DFS)',
+    description: 'DFS is a graph traversal algorithm that explores as far as possible along each branch before backtracking. It uses a stack (or recursion) to remember where to return when hitting a dead end.',
+    timeComplexity: 'O(V + E) where V is the number of vertices and E is the number of edges',
+    spaceComplexity: 'O(V) where V is the number of vertices',
+    pseudocode: [
+      'procedure DFS(G, startVertex):',
+      '    mark startVertex as visited',
+      '    for each neighbor of startVertex:',
+      '        if neighbor is not visited:',
+      '            DFS(G, neighbor)'
+    ]
+  }
+};
+
+const AVAILABLE_ALGORITHMS = Object.values(ALGORITHMS).map(({ id, name }) => ({
+  id,
+  name
+}));
 
 const AlgorithmExploration: React.FC = () => {
-  const { structure, type } = useParams<{ structure: string; type: string }>();
+  const { structure } = useParams<{ structure: string }>();
   const location = useLocation();
+  const navigate = useNavigate();
+  const [visualizationSpeed, setVisualizationSpeed] = useState(1000);
+  const [type, setType] = useState<string>('bfs');
 
   // Debug component lifecycle
   useEffect(() => {
@@ -30,7 +67,7 @@ const AlgorithmExploration: React.FC = () => {
     highlightNodes,
     stopHighlighting
   } = useNodeHighlighting({
-    delay: 500,
+    delay: visualizationSpeed,
     onAnimationComplete: () => {
       console.log('Animation sequence completed');
     }
@@ -76,9 +113,11 @@ const AlgorithmExploration: React.FC = () => {
   };
 
   const dfs = (startId: string, nodes: any[], edges: any[]): string[] => {
+    console.log('Starting DFS with:', { startId, nodesCount: nodes.length, edgesCount: edges.length });
     const visited = new Set<string>();
     const sequence: string[] = [];
     
+    // Create adjacency list
     const adjacencyList = new Map<string, string[]>();
     edges.forEach(edge => {
       if (!adjacencyList.has(edge.source)) adjacencyList.set(edge.source, []);
@@ -87,11 +126,15 @@ const AlgorithmExploration: React.FC = () => {
       adjacencyList.get(edge.target)!.push(edge.source);
     });
 
+    console.log('Adjacency list:', Object.fromEntries(adjacencyList));
+
     const dfsRecursive = (nodeId: string) => {
+      console.log('Visiting node:', nodeId);
       visited.add(nodeId);
       sequence.push(nodeId);
       
       const neighbors = adjacencyList.get(nodeId) || [];
+      console.log(`Node ${nodeId} neighbors:`, neighbors);
       for (const neighbor of neighbors) {
         if (!visited.has(neighbor)) {
           dfsRecursive(neighbor);
@@ -100,6 +143,7 @@ const AlgorithmExploration: React.FC = () => {
     };
 
     dfsRecursive(startId);
+    console.log('Final DFS sequence:', sequence);
     return sequence;
   };
 
@@ -128,6 +172,11 @@ const AlgorithmExploration: React.FC = () => {
     ]
   }), []);
 
+  const handleAlgorithmChange = (algorithmId: string) => {
+    navigate(`/datastructures/${structure}/${algorithmId}`);
+    stopHighlighting();
+  };
+
   const renderVisualization = () => {
     if (structure === 'graph') {
       console.log('Rendering graph visualization');
@@ -135,67 +184,87 @@ const AlgorithmExploration: React.FC = () => {
       const handleBFSHighlight = () => {
         console.log('Starting BFS traversal');
         const sequence = bfs('1', nodes, edges);
+        console.log('BFS sequence:', sequence);
         highlightNodes(sequence);
       };
 
       const handleDFSHighlight = () => {
         console.log('Starting DFS traversal');
         const sequence = dfs('1', nodes, edges);
+        console.log('DFS sequence:', sequence);
         highlightNodes(sequence);
       };
 
+      // Use the correct handler based on algorithm type
+      const handleVisualization = () => {
+        console.log('Current algorithm type:', type);
+        if (type === 'dfs') {
+          handleDFSHighlight();
+        } else {
+          handleBFSHighlight();
+        }
+      };
+
+      const currentAlgorithm = ALGORITHMS[type as keyof typeof ALGORITHMS] || ALGORITHMS.bfs;
+      const algorithmInfo = {
+        ...currentAlgorithm,
+        visualizationState: {
+          isPlaying: isAnimating,
+          currentStep: visitedNodes.size,
+          speed: visualizationSpeed
+        },
+        steps: isAnimating ? {
+          current: visitedNodes.size,
+          total: nodes.length,
+          description: `Visited ${visitedNodes.size} of ${nodes.length} nodes`
+        } : undefined
+      };
+
       return (
-        <div className="graph-container">
-          <GraphVisualization 
-            nodes={nodes} 
-            edges={edges}
-            width={800}
-            height={600}
-            highlightedNode={currentHighlight}
-            visitedNodes={visitedNodes}
-          />
-          <div className="controls">
-            <button 
-              onClick={handleBFSHighlight}
-              disabled={isAnimating}
-            >
-              {isAnimating ? 'Highlighting...' : 'BFS Highlight'}
-            </button>
-            <button 
-              onClick={handleDFSHighlight}
-              disabled={isAnimating}
-            >
-              {isAnimating ? 'Highlighting...' : 'DFS Highlight'}
-            </button>
-            {isAnimating && (
+        <div className="algorithm-exploration-container">
+          <div className="algorithm-explanation-panel">
+            <AlgorithmExplanation
+              algorithm={algorithmInfo}
+              availableAlgorithms={AVAILABLE_ALGORITHMS}
+              onAlgorithmChange={handleAlgorithmChange}
+              onSpeedChange={setVisualizationSpeed}
+            />
+          </div>
+          <div className="visualization-panel">
+            <GraphVisualization 
+              nodes={nodes} 
+              edges={edges}
+              width={800}
+              height={400}
+              highlightedNode={currentHighlight}
+              visitedNodes={visitedNodes}
+            />
+            <div className="controls">
               <button 
-                onClick={stopHighlighting}
-                className="stop-button"
+                onClick={handleVisualization}
+                disabled={isAnimating}
               >
-                Stop
+                {isAnimating ? 'Visualizing...' : `Start ${type.toUpperCase()}`}
               </button>
-            )}
+              {isAnimating && (
+                <button 
+                  onClick={stopHighlighting}
+                  className="stop-button"
+                >
+                  Stop
+                </button>
+              )}
+            </div>
           </div>
         </div>
       );
     }
-    return (
-      <div className="coming-soon">
-        <h2>Coming Soon</h2>
-        <p>Visualization for {structure} - {type} is under development.</p>
-      </div>
-    );
+    return null;
   };
 
   return (
     <div className="algorithm-exploration">
-      <div className="algorithm-exploration__header">
-        <h1>{type} {structure}</h1>
-        <p>Explore and understand the structure and behavior</p>
-      </div>
-      <div className="algorithm-exploration__content">
-        {renderVisualization()}
-      </div>
+      {renderVisualization()}
     </div>
   );
 };
