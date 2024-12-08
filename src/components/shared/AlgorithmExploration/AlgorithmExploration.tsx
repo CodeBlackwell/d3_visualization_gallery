@@ -3,6 +3,7 @@ import './AlgorithmExploration.css';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import GraphVisualization from '../GraphVisualization/GraphVisualization';
 import AlgorithmExplanation from '../AlgorithmExplanation/AlgorithmExplanation';
+import DataStructureExplanation from '../DataStructureExplanation/DataStructureExplanation';
 import { useNodeHighlighting } from '../../../hooks/useNodeHighlighting';
 
 const ALGORITHMS = {
@@ -38,6 +39,24 @@ const ALGORITHMS = {
       '    for each neighbor of startVertex:',
       '        if neighbor is not visited:',
       '            DFS(G, neighbor)'
+    ]
+  }
+};
+
+const DATA_STRUCTURES = {
+  graph: {
+    type: 'graph',
+    name: 'Graph',
+    description: 'A graph is a non-linear data structure consisting of vertices (nodes) and edges that connect these vertices. It is used to represent relationships between different entities. In this visualization, we use an undirected graph where edges have no direction and connections are bi-directional.',
+    properties: [
+      {
+        label: 'Vertices',
+        value: '20 nodes connected in a circular pattern with cross-connections'
+      },
+      {
+        label: 'Edge Type',
+        value: 'Undirected (bi-directional connections)'
+      }
     ]
   }
 };
@@ -224,6 +243,9 @@ const AlgorithmExploration: React.FC = () => {
       return (
         <div className="algorithm-exploration-container">
           <div className="algorithm-explanation-panel">
+            <DataStructureExplanation 
+              dataStructure={DATA_STRUCTURES[structure as keyof typeof DATA_STRUCTURES]}
+            />
             <AlgorithmExplanation
               algorithm={algorithmInfo}
               availableAlgorithms={AVAILABLE_ALGORITHMS}

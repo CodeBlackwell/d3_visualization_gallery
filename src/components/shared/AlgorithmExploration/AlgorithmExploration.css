@@ -17,7 +17,10 @@
 
 .algorithm-explanation-panel {
   height: 100%;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-y: auto;
 }
 
 .visualization-panel {
