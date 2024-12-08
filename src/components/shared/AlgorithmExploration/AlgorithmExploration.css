@@ -1,0 +1,20 @@
+.algorithm-exploration {
+  padding: 2rem;
+}
+
+.algorithm-exploration__header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.algorithm-exploration__content {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 2rem;
+}
+
+.algorithm-selection {
+  background: #f5f5f5;
+  padding: 1rem;
+  border-radius: 8px;
+}

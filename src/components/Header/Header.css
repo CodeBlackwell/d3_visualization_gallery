@@ -47,6 +47,7 @@
   position: relative;
   padding-bottom: 1rem;
   margin-bottom: -1rem;
+  display: inline-block;
 }
 
 .datasets-button {
@@ -84,6 +85,7 @@
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.2s ease, visibility 0.2s ease;
+  z-index: 1000;
 }
 
 .dropdown-container:hover .dropdown-menu {
@@ -97,11 +99,44 @@
   color: #9CA3AF;
   text-decoration: none;
   transition: background-color 0.2s ease, color 0.2s ease;
+  position: relative;
 }
 
 .dropdown-item:hover {
   background-color: #2D3748;
   color: #C1A15A;
+}
+
+.nested-dropdown {
+  position: relative;
+  display: block;
+}
+
+.nested-dropdown-menu {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  background-color: #2D2F31;
+  min-width: 200px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  display: none;
+  z-index: 1001;
+}
+
+.nested-dropdown:hover > .nested-dropdown-menu {
+  display: block;
+}
+
+.dropdown-item-with-arrow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 2rem;
+}
+
+.dropdown-arrow {
+  margin-left: 0.5rem;
 }
 
 @media (max-width: 768px) {
