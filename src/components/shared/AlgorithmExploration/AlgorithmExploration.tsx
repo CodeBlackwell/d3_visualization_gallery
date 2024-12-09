@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './AlgorithmExploration.css';
 import { useParams, useNavigate } from 'react-router-dom';
 import AlgorithmExplanation from '../AlgorithmExplanation/AlgorithmExplanation';
@@ -8,17 +8,24 @@ import UndirectedGraphVisualization from '../../DataStructures/Graph/UndirectedG
 import { UNDIRECTED_GRAPH, GRAPH_ALGORITHMS } from '../../DataStructures/Graph/UndirectedGraph/config';
 import { Algorithm } from '../../DataStructures/types';
 import { bfs, dfs } from '../../DataStructures/Graph/algorithms';
-
-const AVAILABLE_ALGORITHMS = Object.values(GRAPH_ALGORITHMS).map(({ id, name }) => ({
-  id,
-  name
-}));
+import { DATA_STRUCTURES, DataStructureType, GraphType } from '../../../constants/dataStructureConfig';
 
 const AlgorithmExploration: React.FC = () => {
-  const { structure } = useParams<{ structure: string }>();
+  const { category, type, algorithm } = useParams<{ category: DataStructureType; type: GraphType; algorithm: string }>();
   const navigate = useNavigate();
+  
+  console.log('URL Params:', { category, type, algorithm });
+  console.log('Available Data Structures:', DATA_STRUCTURES);
+  
   const [visualizationSpeed, setVisualizationSpeed] = useState(1000);
-  const [type, setType] = useState<keyof typeof GRAPH_ALGORITHMS>('bfs');
+  const [currentAlgorithm, setCurrentAlgorithm] = useState<keyof typeof GRAPH_ALGORITHMS>('bfs');
+
+  useEffect(() => {
+    console.log('Effect triggered with algorithm:', algorithm);
+    if (algorithm && Object.keys(GRAPH_ALGORITHMS).includes(algorithm)) {
+      setCurrentAlgorithm(algorithm as keyof typeof GRAPH_ALGORITHMS);
+    }
+  }, [algorithm]);
 
   const {
     currentHighlight,
@@ -29,65 +36,74 @@ const AlgorithmExploration: React.FC = () => {
   } = useNodeHighlighting({ delay: visualizationSpeed });
 
   const handleAlgorithmChange = (algorithmId: keyof typeof GRAPH_ALGORITHMS) => {
-    setType(algorithmId);
-    navigate(`/datastructures/${structure}/${algorithmId}`);
+    console.log('Algorithm change:', algorithmId);
+    setCurrentAlgorithm(algorithmId);
+    navigate(`/datastructures/${category}/${type}/${algorithmId}`);
     stopHighlighting();
   };
 
-  const renderVisualization = () => {
-    if (structure === 'graph') {
-      const handleBFSHighlight = () => {
-        console.log('Starting BFS traversal');
-        const sequence = bfs('1', UNDIRECTED_GRAPH.nodes, UNDIRECTED_GRAPH.edges);
-        console.log('BFS sequence:', sequence);
-        highlightNodes(sequence);
-      };
-
-      const handleDFSHighlight = () => {
-        console.log('Starting DFS traversal');
-        const sequence = dfs('1', UNDIRECTED_GRAPH.nodes, UNDIRECTED_GRAPH.edges);
-        console.log('DFS sequence:', sequence);
-        highlightNodes(sequence);
-      };
-
-      const handleVisualization = () => {
-        console.log('Current algorithm type:', type);
-        if (type === 'dfs') {
-          handleDFSHighlight();
-        } else {
-          handleBFSHighlight();
+  const handleVisualization = () => {
+    console.log('Visualization triggered:', { category, type, currentAlgorithm });
+    if (category === 'graph') {
+      if (type === 'undirected' || type === 'directed') {  
+        if (currentAlgorithm === 'bfs') {
+          console.log('Starting BFS traversal');
+          const sequence = bfs('1', UNDIRECTED_GRAPH.nodes, UNDIRECTED_GRAPH.edges);
+          console.log('BFS sequence:', sequence);
+          highlightNodes(sequence);
+        } else if (currentAlgorithm === 'dfs') {
+          console.log('Starting DFS traversal');
+          const sequence = dfs('1', UNDIRECTED_GRAPH.nodes, UNDIRECTED_GRAPH.edges);
+          console.log('DFS sequence:', sequence);
+          highlightNodes(sequence);
         }
-      };
+      }
+    }
+  };
 
-      const currentAlgorithm = GRAPH_ALGORITHMS[type] ?? GRAPH_ALGORITHMS.bfs;
-      const algorithmInfo: Algorithm = {
-        ...currentAlgorithm,
-        visualizationState: {
-          isPlaying: isAnimating,
-          currentStep: visitedNodes.size,
-          speed: visualizationSpeed
-        },
-        steps: isAnimating ? {
-          current: visitedNodes.size,
-          total: UNDIRECTED_GRAPH.nodes.length,
-          description: `Visited ${visitedNodes.size} of ${UNDIRECTED_GRAPH.nodes.length} nodes`
-        } : undefined
-      };
+  if (!category) {
+    console.log('Missing category');
+    return <div>Missing category parameter</div>;
+  }
 
-      return (
-        <div className="algorithm-exploration-container">
-          <div className="algorithm-explanation-panel">
-            <DataStructureExplanation 
-              dataStructure={UNDIRECTED_GRAPH}
-            />
-            <AlgorithmExplanation
-              algorithm={algorithmInfo}
-              availableAlgorithms={AVAILABLE_ALGORITHMS}
-              onAlgorithmChange={handleAlgorithmChange}
-              onSpeedChange={setVisualizationSpeed}
-            />
-          </div>
-          <div className="visualization-panel">
+  if (!type) {
+    console.log('Missing type');
+    return <div>Missing type parameter</div>;
+  }
+
+  if (!DATA_STRUCTURES[category]) {
+    console.log('Invalid category:', category);
+    return <div>Invalid category: {category}</div>;
+  }
+
+  if (!DATA_STRUCTURES[category].types[type]) {
+    console.log('Invalid type:', type, 'for category:', category);
+    return <div>Invalid type: {type} for {category}</div>;
+  }
+
+  const algorithmInfo = GRAPH_ALGORITHMS[currentAlgorithm];
+
+  return (
+    <div className="algorithm-exploration">
+      <div className="algorithm-explanation-panel">
+        <div className="explanation-scroll-container">
+          <DataStructureExplanation 
+            dataStructure={UNDIRECTED_GRAPH}
+          />
+          <AlgorithmExplanation
+            algorithm={algorithmInfo}
+            availableAlgorithms={Object.values(GRAPH_ALGORITHMS).map(({ id, name }) => ({
+              id,
+              name
+            }))}
+            onAlgorithmChange={handleAlgorithmChange}
+            onSpeedChange={setVisualizationSpeed}
+          />
+        </div>
+      </div>
+      <div className="algorithm-exploration-container">
+        <div className="visualization-panel">
+          <div className="visualization-content">
             <UndirectedGraphVisualization
               nodes={UNDIRECTED_GRAPH.nodes}
               edges={UNDIRECTED_GRAPH.edges}
@@ -100,8 +116,9 @@ const AlgorithmExploration: React.FC = () => {
               <button 
                 onClick={handleVisualization}
                 disabled={isAnimating}
+                className="primary-button"
               >
-                {isAnimating ? 'Visualizing...' : `Start ${type.toUpperCase()}`}
+                {isAnimating ? 'Visualizing...' : `Start ${currentAlgorithm.toUpperCase()}`}
               </button>
               {isAnimating && (
                 <button 
@@ -114,14 +131,7 @@ const AlgorithmExploration: React.FC = () => {
             </div>
           </div>
         </div>
-      );
-    }
-    return null;
-  };
-
-  return (
-    <div className="algorithm-exploration">
-      {renderVisualization()}
+      </div>
     </div>
   );
 };
