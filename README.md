@@ -1,4 +1,4 @@
-# 🎨 D3.js Visualization Gallery
+# 🎨 D3 Visualization Gallery - LLM Training Dataset
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![D3.js](https://img.shields.io/badge/D3.js-F9A03C?style=for-the-badge&logo=d3.js&logoColor=white)](https://d3js.org/)
@@ -6,15 +6,20 @@
 [![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
-> 🚀 A modern, TypeScript-powered gallery of D3.js visualizations with React components and interactive features.
+> 🚀 A comprehensive collection of production-ready D3.js visualizations implemented in React and TypeScript, designed to train Large Language Models (LLMs) in generating functional visualizations from natural language queries.
 
 ## 🎯 Project Objective
 
-This project showcases D3.js visualizations in a modern React application, featuring:
-1. TypeScript integration for improved type safety and developer experience
-2. Modular component architecture for easy extension
-3. Interactive visualization gallery with configurable options
-4. Dark theme with responsive design and smooth animations
+This project aims to create a robust dataset of D3.js visualizations that can be used to train LLMs, featuring:
+
+1. Production-ready, fully implemented visualizations of varying complexity
+2. Clean, type-safe TypeScript code with React integration
+3. Comprehensive documentation of visualization parameters and usage
+4. Wide range of visualization types and complexity levels
+5. Structured data format suitable for LLM training
+6. Natural language descriptions paired with functional code
+
+The ultimate goal is to enable LLMs to understand and generate accurate, functional D3.js visualizations based on natural language descriptions and requirements.
 
 ## 🌟 Features
 
@@ -55,21 +60,43 @@ This project showcases D3.js visualizations in a modern React application, featu
 ```
 src/
 ├── components/
-│   ├── Basic/
-│   │   └── Network/
-│   │       └── Arc-diagram-interactive/
-│   │           ├── ArcDiagramNetwork/
-│   │           │   ├── ArcDiagram.tsx
-│   │           │   └── ArcDiagram.css
-│   │           └── hooks/
-│   │               └── useArcDiagram.ts
-│   ├── Header/
-│   ├── Footer/
-│   └── VisualizationGallery/
-├── constants/
-├── types/
-└── App.tsx
+│   ├── Visualizations/          # Core visualization components
+│   │   ├── Basic/              # Simple, foundational visualizations
+│   │   └── DeepDive/           # Complex, advanced visualizations
+│   ├── DataStructures/         # Reusable data structure implementations
+│   │   ├── Graph/              # Graph-based visualization components
+│   │   └── types.ts           # TypeScript type definitions
+│   ├── shared/                 # Shared visualization components
+│   │   ├── AlgorithmExploration/     # Interactive algorithm demonstrations
+│   │   ├── DatasetExploration/       # Dataset visualization tools
+│   │   ├── GraphVisualization/       # Graph rendering components
+│   │   └── VisualizationContainer/   # Container components
+│   └── VisualizationGallery/   # Gallery interface components
+├── constants/                  # Configuration and theme settings
+│   ├── dataStructureConfig.ts  # Data structure configurations
+│   ├── visualizationConfig.ts  # Visualization parameters
+│   └── visualizationTheme.ts   # Theming and styling constants
+├── hooks/                      # Custom React hooks
+├── services/                   # Data processing and API services
+├── types/                      # TypeScript type definitions
+└── utils/                      # Utility functions and helpers
 ```
+
+### 📊 Dataset Organization
+
+Each visualization in the dataset includes:
+1. **Implementation Files**: TypeScript/React components with D3.js integration
+2. **Type Definitions**: Comprehensive TypeScript interfaces and types
+3. **Natural Language Descriptions**: Detailed descriptions of visualization purpose and behavior
+4. **Configuration Options**: Customizable parameters and their effects
+5. **Usage Examples**: Sample implementations with varying complexity levels
+6. **Test Cases**: Validation scenarios and edge cases
+
+This structure is designed to provide LLMs with:
+- Clear relationships between natural language requirements and implementation code
+- Progressive complexity levels for learning visualization patterns
+- Consistent patterns in component organization and implementation
+- Rich context for understanding visualization architecture and best practices
 
 ## 🚀 Getting Started
 
