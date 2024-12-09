@@ -31,29 +31,79 @@ The ultimate goal is to enable LLMs to understand and generate accurate, functio
 - 📱 Responsive design
 - 🐛 Comprehensive error handling
 
-## 🎬 Current Visualizations
+## 🎬 Visualization Dataset Categories
 
-### 🔄 Arc Diagram
-- Network visualization showing researcher connections
-- Interactive node highlighting with tooltips
-- Smooth transitions and hover effects
-- Dark theme with gold accent colors
-- Responsive SVG scaling
+Our dataset is organized into progressive complexity levels to facilitate structured learning for LLMs:
 
-### 🔀 Force-Directed Graph (Coming Soon)
-- Interactive network relationships
-- Dynamic force simulation
-- Node dragging and zooming capabilities
+### 🔰 Basic Visualizations
+- **Bar Charts & Histograms**
+  - Simple data distribution visualization
+  - Axis handling and scale transformations
+  - Data binning and aggregation techniques
+  
+- **Line & Area Charts**
+  - Time series data representation
+  - Multiple series handling
+  - Interpolation methods
+  
+- **Scatter Plots**
+  - 2D data point visualization
+  - Color and size encoding
+  - Zoom and pan interactions
 
-### 🌳 Tree Visualization (Coming Soon)
-- Hierarchical data representation
-- Collapsible nodes for data exploration
-- Smooth transitions between states
+### 🔄 Intermediate Network Visualizations
+- **Force-Directed Graphs**
+  - Node-link relationship visualization
+  - Force simulation parameters
+  - Interactive node dragging
+  
+- **Arc Diagrams**
+  - Linear network layout
+  - Edge bundling techniques
+  - Node clustering strategies
+  
+- **Tree Layouts**
+  - Hierarchical data structures
+  - Collapsible tree interactions
+  - Parent-child relationships
 
-### 💫 Bubble Chart (Coming Soon)
-- Data proportion visualization
-- Interactive tooltips
-- Dynamic size scaling
+### 🎯 Advanced Data Structures
+- **Complex Network Visualizations**
+  - Multi-level force layouts
+  - Dynamic graph updates
+  - Large-scale data handling
+  
+- **Sankey Diagrams**
+  - Flow visualization
+  - Node ranking
+  - Interactive flow tracing
+
+### 🧮 Algorithm Visualizations
+- **Pathfinding Algorithms**
+  - Step-by-step execution
+  - State management
+  - Algorithm comparison views
+  
+- **Sorting Visualizations**
+  - Array manipulation
+  - Transition animations
+  - Performance metrics
+
+Each visualization category includes:
+- 📝 Detailed implementation documentation
+- 🎨 Customizable styling options
+- 🔧 Configuration parameters
+- 📊 Sample datasets
+- 🧪 Test cases
+- 💡 Natural language descriptions
+- 🔄 Interactive features
+
+This structured approach enables LLMs to learn:
+1. Progressive complexity in visualization implementation
+2. Common patterns and best practices
+3. Data structure relationships
+4. Interactive feature implementation
+5. Performance optimization techniques
 
 ## 📁 Project Structure
 
