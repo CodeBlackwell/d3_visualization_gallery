@@ -4,6 +4,7 @@ import ArcDiagram from '../Visualizations/Basic/Network/Arc-diagram-interactive/
 import WorldMap from '../Visualizations/Basic/WorldMap/Projection2D/WorldMap';
 import Scatterplot from '../Visualizations/Basic/Scatterplot/Scatterplot';
 import RadialChart from '../Visualizations/Basic/RadialChart/RadialChart';
+import ChordDiagram from '../Visualizations/Basic/Chord/ChordDiagram';
 import DatasetExploration from '../shared/DatasetExploration/DatasetExploration';
 import { VISUALIZATIONS } from '../../constants/visualizationConfig';
 import './../DatasetExploration/DatasetExploration.css'; // Reusable component styles
@@ -42,6 +43,16 @@ const galleryConfig = {
       description: "Interactive radial chart visualization using D3.js",
       component: <RadialChart 
         dataUrl="https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/7_OneCatOneNum.csv"
+      />
+    },
+    {
+      type: 'chord',
+      title: "Chord Diagram",
+      description: "Interactive chord diagram showing relationships between entities",
+      component: <ChordDiagram 
+        width={440}
+        height={440}
+        dataUrl="/sample-chord-data.json"
       />
     },
     {
